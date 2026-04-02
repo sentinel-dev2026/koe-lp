@@ -83,6 +83,7 @@ const testimonials = [
     comment:
       "施術後の仕上がりが毎回素晴らしく、友人にも勧めています。予約もスムーズで助かっています。",
     initial: "田",
+    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
   },
   {
     name: "佐藤健太",
@@ -90,6 +91,7 @@ const testimonials = [
     rating: 5,
     comment: "予約が取りやすく、スタッフの対応も丁寧です。リピーターが増えました。",
     initial: "佐",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
   },
   {
     name: "山田花子",
@@ -98,6 +100,7 @@ const testimonials = [
     comment:
       "初めてでしたが、リラックスできる雰囲気で安心しました。生徒さんの声が簡単に集まります。",
     initial: "山",
+    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face",
   },
   {
     name: "鈴木一郎",
@@ -106,6 +109,7 @@ const testimonials = [
     comment:
       "技術力が高く、イメージ通りに仕上げてくれます。クライアント案件で重宝しています。",
     initial: "鈴",
+    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
   },
 ];
 
@@ -379,9 +383,7 @@ function DashboardMock() {
       <div className="space-y-2">
         {testimonials.slice(0, 3).map((t) => (
           <div key={t.name} className="flex items-center gap-3 rounded-md border border-gray-100 px-3 py-2">
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#F5F3EF] text-[11px] font-bold text-[#1A1A1A]">
-              {t.initial}
-            </span>
+            <img src={t.image} alt={t.name} className="h-7 w-7 shrink-0 rounded-full object-cover" />
             <div className="min-w-0 flex-1">
               <p className="truncate text-xs text-[#1A1A1A]">{t.name}</p>
               <p className="truncate text-[10px] text-[#374151]">{t.comment}</p>
@@ -530,9 +532,7 @@ function WidgetDemoCard({ isActive }: { isActive: boolean }) {
               {testimonials.map((t) => (
                 <div key={t.name} className="rounded-md border border-gray-200 bg-white p-4">
                   <div className="mb-2.5 flex items-center gap-2.5">
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#F5F3EF] text-xs font-bold text-[#1A1A1A]">
-                      {t.initial}
-                    </span>
+                    <img src={t.image} alt={t.name} className="h-8 w-8 rounded-full object-cover" />
                     <div>
                       <p className="text-sm font-medium text-[#1A1A1A]">{t.name}</p>
                       <Stars count={t.rating} />
@@ -585,9 +585,7 @@ function WidgetDemoCarousel({ isActive }: { isActive: boolean }) {
           <WidgetBrowserFrame>
             <div className="relative mx-auto max-w-sm">
               <div className="rounded-md border border-gray-200 bg-white p-6 text-center">
-                <span className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#F5F3EF] text-sm font-bold text-[#1A1A1A]">
-                  {t.initial}
-                </span>
+                <img src={t.image} alt={t.name} className="mx-auto mb-3 h-10 w-10 rounded-full object-cover" />
                 <div className="mb-3 flex justify-center">
                   <Stars count={t.rating} />
                 </div>
@@ -800,9 +798,9 @@ function AfterCollect({ isActive }: { isActive: boolean }) {
 
 function DashboardPreview({ isActive }: { isActive: boolean }) {
   const dashboardVoices = [
-    { name: "田中 美咲", initial: "田", bg: "bg-pink-100", text: "text-pink-600", rating: 5, comment: "施術後の仕上がりが毎回素晴らしく…", status: "承認済み", statusColor: "bg-green-50 text-green-700" },
-    { name: "山田 花子", initial: "山", bg: "bg-purple-100", text: "text-purple-600", rating: 4, comment: "初めてでしたが、リラックスできる…", status: "未承認", statusColor: "bg-orange-50 text-orange-700" },
-    { name: "高橋 由美", initial: "高", bg: "bg-amber-100", text: "text-amber-600", rating: 3, comment: "待ち時間が少し長かった…", status: "非公開", statusColor: "bg-gray-100 text-gray-500" },
+    { name: "田中 美咲", initial: "田", bg: "bg-pink-100", text: "text-pink-600", rating: 5, comment: "施術後の仕上がりが毎回素晴らしく…", status: "承認済み", statusColor: "bg-green-50 text-green-700", image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" },
+    { name: "山田 花子", initial: "山", bg: "bg-purple-100", text: "text-purple-600", rating: 4, comment: "初めてでしたが、リラックスできる…", status: "未承認", statusColor: "bg-orange-50 text-orange-700", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face" },
+    { name: "高橋 由美", initial: "高", bg: "bg-amber-100", text: "text-amber-600", rating: 3, comment: "待ち時間が少し長かった…", status: "非公開", statusColor: "bg-gray-100 text-gray-500", image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face" },
   ];
 
   return (
@@ -865,9 +863,7 @@ function DashboardPreview({ isActive }: { isActive: boolean }) {
                 <div className="divide-y divide-gray-50">
                   {dashboardVoices.map((v) => (
                     <div key={v.name} className="flex items-center gap-2 md:gap-3 px-2 md:px-3 py-1.5 md:py-2">
-                      <span className={`flex h-5 w-5 md:h-6 md:w-6 shrink-0 items-center justify-center rounded-full ${v.bg} ${v.text} text-[8px] md:text-[10px] font-bold`}>
-                        {v.initial}
-                      </span>
+                      <img src={v.image} alt={v.name} className="h-5 w-5 md:h-6 md:w-6 shrink-0 rounded-full object-cover" />
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5">
                           <span className="text-[10px] md:text-xs font-medium text-[#1A1A1A]">{v.name}</span>
@@ -965,9 +961,7 @@ function AfterDisplay({ isActive }: { isActive: boolean }) {
               {testimonials.slice(0, 3).map((t) => (
                 <div key={t.name} className="rounded-md border border-gray-100 p-3 md:p-4">
                   <div className="flex items-center gap-2.5">
-                    <span className="flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-full bg-[#F5F3EF] text-xs md:text-sm font-bold text-[#1A1A1A]">
-                      {t.initial}
-                    </span>
+                    <img src={t.image} alt={t.name} className="h-8 w-8 md:h-9 md:w-9 rounded-full object-cover" />
                     <div>
                       <p className="text-xs md:text-sm font-medium text-[#1A1A1A]">{t.name}</p>
                       <Stars count={t.rating} />
