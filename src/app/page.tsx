@@ -1263,11 +1263,35 @@ function FAQ({ isActive }: { isActive: boolean }) {
 function WaitlistSection({ isActive }: { isActive: boolean }) {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({ email });
-    setSubmitted(true);
+    setLoading(true);
+    setErrorMsg("");
+
+    try {
+      const res = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setSubmitted(true);
+      } else if (data.duplicate) {
+        setErrorMsg("このメールアドレスは既に登録済みです");
+      } else {
+        setErrorMsg(data.error || "登録に失敗しました");
+      }
+    } catch {
+      setErrorMsg("通信エラーが発生しました。もう一度お試しください");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -1290,21 +1314,28 @@ function WaitlistSection({ isActive }: { isActive: boolean }) {
               </p>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="flex gap-2">
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                className="min-w-0 flex-1 rounded-md border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-[#E8634A]"
-              />
-              <button
-                type="submit"
-                className="shrink-0 rounded-md bg-[#E8634A] px-6 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90"
-              >
-                登録
-              </button>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  disabled={loading}
+                  className="min-w-0 flex-1 rounded-md border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-[#E8634A] disabled:opacity-50"
+                />
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="shrink-0 rounded-md bg-[#E8634A] px-6 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                >
+                  {loading ? "登録中..." : "登録"}
+                </button>
+              </div>
+              {errorMsg && (
+                <p className="text-sm text-red-500">{errorMsg}</p>
+              )}
             </form>
           )}
         </AnimatedSection>
