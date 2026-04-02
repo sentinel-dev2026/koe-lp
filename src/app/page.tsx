@@ -1283,7 +1283,7 @@ function WaitlistSection({ isActive }: { isActive: boolean }) {
           <h2 className="mb-3 text-3xl font-bold md:text-4xl">
             事前登録する
           </h2>
-          <p className="mb-8 text-base text-[#374151]">
+          <p className="mb-8 text-base text-[#1A1A1A]">
             リリース時に優先的にご案内します
           </p>
 
