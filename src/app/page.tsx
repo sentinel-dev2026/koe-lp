@@ -83,7 +83,7 @@ const testimonials = [
     comment:
       "施術後の仕上がりが毎回素晴らしく、友人にも勧めています。予約もスムーズで助かっています。",
     initial: "田",
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
+    image: "https://images.unsplash.com/photo-1624706477323-a31e11c3ea1f?w=100&h=100&fit=crop&crop=face",
   },
   {
     name: "佐藤健太",
@@ -91,7 +91,7 @@ const testimonials = [
     rating: 5,
     comment: "予約が取りやすく、スタッフの対応も丁寧です。リピーターが増えました。",
     initial: "佐",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
+    image: "https://images.unsplash.com/photo-1630572780070-fce8b9e1e7e7?w=100&h=100&fit=crop&crop=face",
   },
   {
     name: "山田花子",
@@ -100,7 +100,7 @@ const testimonials = [
     comment:
       "初めてでしたが、リラックスできる雰囲気で安心しました。生徒さんの声が簡単に集まります。",
     initial: "山",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face",
+    image: "https://images.unsplash.com/photo-1624091844772-554661d10173?w=100&h=100&fit=crop&crop=face",
   },
   {
     name: "鈴木一郎",
@@ -109,7 +109,7 @@ const testimonials = [
     comment:
       "技術力が高く、イメージ通りに仕上げてくれます。クライアント案件で重宝しています。",
     initial: "鈴",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
+    image: "https://images.unsplash.com/photo-1617196701537-7329482cc9fe?w=100&h=100&fit=crop&crop=face",
   },
 ];
 
@@ -798,9 +798,9 @@ function AfterCollect({ isActive }: { isActive: boolean }) {
 
 function DashboardPreview({ isActive }: { isActive: boolean }) {
   const dashboardVoices = [
-    { name: "田中 美咲", initial: "田", bg: "bg-pink-100", text: "text-pink-600", rating: 5, comment: "施術後の仕上がりが毎回素晴らしく…", status: "承認済み", statusColor: "bg-green-50 text-green-700", image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" },
-    { name: "山田 花子", initial: "山", bg: "bg-purple-100", text: "text-purple-600", rating: 4, comment: "初めてでしたが、リラックスできる…", status: "未承認", statusColor: "bg-orange-50 text-orange-700", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face" },
-    { name: "高橋 由美", initial: "高", bg: "bg-amber-100", text: "text-amber-600", rating: 3, comment: "待ち時間が少し長かった…", status: "非公開", statusColor: "bg-gray-100 text-gray-500", image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face" },
+    { name: "田中 美咲", initial: "田", bg: "bg-pink-100", text: "text-pink-600", rating: 5, comment: "施術後の仕上がりが毎回素晴らしく…", status: "承認済み", statusColor: "bg-green-50 text-green-700", image: "https://images.unsplash.com/photo-1624706477323-a31e11c3ea1f?w=100&h=100&fit=crop&crop=face" },
+    { name: "山田 花子", initial: "山", bg: "bg-purple-100", text: "text-purple-600", rating: 4, comment: "初めてでしたが、リラックスできる…", status: "未承認", statusColor: "bg-orange-50 text-orange-700", image: "https://images.unsplash.com/photo-1624091844772-554661d10173?w=100&h=100&fit=crop&crop=face" },
+    { name: "高橋 由美", initial: "高", bg: "bg-amber-100", text: "text-amber-600", rating: 3, comment: "待ち時間が少し長かった…", status: "非公開", statusColor: "bg-gray-100 text-gray-500", image: "https://images.unsplash.com/photo-1624706477318-2b624c31e2e4?w=100&h=100&fit=crop&crop=face" },
   ];
 
   return (
