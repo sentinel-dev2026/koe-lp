@@ -1,551 +1,1509 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import {
+  motion,
+  type Variants,
+} from "framer-motion";
+import {
+  FileText,
+  CheckCircle,
+  Code,
+  Star,
+  LayoutGrid,
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  Copy,
+  Check,
+  Send,
+  Plus,
+  Minus,
+  Palette,
+  Shield,
+  Download,
+} from "lucide-react";
 
-/* ─── Constants ─── */
-const TOTAL = 17;
-const ACCENT = "#C4704B";
+/* ═══════════════════════════════════════════
+   Animation helpers
+   ═══════════════════════════════════════════ */
 
-/* ─── Shared UI ─── */
-function SectionLabel({ cat, num }: { cat: string; num: number }) {
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+};
+
+const fadeLeft: Variants = {
+  hidden: { opacity: 0, x: -30 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } },
+};
+
+const fadeRight: Variants = {
+  hidden: { opacity: 0, x: 30 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } },
+};
+
+const staggerContainer = (stagger = 0.15): Variants => ({
+  hidden: {},
+  visible: { transition: { staggerChildren: stagger } },
+});
+
+const scaleUp: Variants = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.6, ease: "easeOut" } },
+};
+
+const popIn: Variants = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.5, ease: [0.175, 0.885, 0.32, 1.275] },
+  },
+};
+
+const bounceFade: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: [0.175, 0.885, 0.32, 1.1] },
+  },
+};
+
+/* ═══════════════════════════════════════════
+   Data
+   ═══════════════════════════════════════════ */
+
+const testimonials = [
+  {
+    name: "田中美咲",
+    role: "エステサロン経営",
+    rating: 5,
+    comment:
+      "施術後の仕上がりが毎回素晴らしく、友人にも勧めています。予約もスムーズで助かっています。",
+    initial: "田",
+  },
+  {
+    name: "佐藤健太",
+    role: "飲食店オーナー",
+    rating: 5,
+    comment: "予約が取りやすく、スタッフの対応も丁寧です。リピーターが増えました。",
+    initial: "佐",
+  },
+  {
+    name: "山田花子",
+    role: "ヨガインストラクター",
+    rating: 4,
+    comment:
+      "初めてでしたが、リラックスできる雰囲気で安心しました。生徒さんの声が簡単に集まります。",
+    initial: "山",
+  },
+  {
+    name: "鈴木一郎",
+    role: "Web制作会社",
+    rating: 5,
+    comment:
+      "技術力が高く、イメージ通りに仕上げてくれます。クライアント案件で重宝しています。",
+    initial: "鈴",
+  },
+];
+
+const features = [
+  {
+    icon: FileText,
+    title: "収集フォーム",
+    desc: "URLを共有するだけ。お客様がフォームから声を投稿できます。",
+  },
+  {
+    icon: CheckCircle,
+    title: "ワンクリック承認",
+    desc: "管理画面から承認・非承認をワンクリックで切り替え。",
+  },
+  {
+    icon: Code,
+    title: "埋め込みウィジェット",
+    desc: "スクリプトタグ1行でサイトにお客様の声を表示。",
+  },
+  {
+    icon: Palette,
+    title: "カスタムデザイン",
+    desc: "カラー・レイアウト・フォントを自由にカスタマイズ。",
+  },
+  {
+    icon: Shield,
+    title: "承認フロー",
+    desc: "掲載前に必ず承認ステップ。不適切な投稿を防止。",
+  },
+  {
+    icon: Download,
+    title: "CSVエクスポート",
+    desc: "収集した声をCSV形式でいつでもダウンロード可能。",
+  },
+];
+
+const plans = [
+  {
+    name: "Free",
+    price: "¥0",
+    period: "",
+    features: ["プロジェクト1件", "お客様の声10件", "基本ウィジェット"],
+    recommended: false,
+  },
+  {
+    name: "Pro",
+    price: "¥1,980",
+    period: "/月",
+    features: [
+      "プロジェクト3件",
+      "お客様の声100件",
+      "カスタムデザイン",
+      "優先サポート",
+    ],
+    recommended: true,
+  },
+  {
+    name: "Agency",
+    price: "¥3,980",
+    period: "/月",
+    features: [
+      "プロジェクト無制限",
+      "お客様の声無制限",
+      "カスタムデザイン",
+      "優先サポート",
+      "API アクセス",
+    ],
+    recommended: false,
+  },
+];
+
+const faqData = [
+  {
+    q: "無料プランに期限はありますか？",
+    a: "いいえ、無料プランは期間無制限でお使いいただけます。",
+  },
+  {
+    q: "クレジットカードは必要ですか？",
+    a: "無料プランではクレジットカードは不要です。有料プランへのアップグレード時にご登録いただきます。",
+  },
+  {
+    q: "どんなサイトにも埋め込めますか？",
+    a: "はい。スクリプトタグ1行を貼り付けるだけで、WordPress・Shopify・静的サイトなどあらゆるサイトに対応します。",
+  },
+  {
+    q: "デザインはカスタマイズできますか？",
+    a: "Pro以上のプランでカラー・レイアウト・フォントなどを自由にカスタマイズ可能です。",
+  },
+  {
+    q: "データのエクスポートは可能ですか？",
+    a: "はい。CSV形式でいつでもエクスポートできます。",
+  },
+  {
+    q: "解約はいつでもできますか？",
+    a: "はい。管理画面からいつでもワンクリックで解約でき、次回更新日以降の課金は発生しません。",
+  },
+];
+
+/* ═══════════════════════════════════════════
+   Shared Components
+   ═══════════════════════════════════════════ */
+
+function Stars({ count }: { count: number }) {
   return (
-    <div className="flex items-center justify-between mb-8">
-      <span className="text-xs font-semibold tracking-widest uppercase" style={{ color: ACCENT }}>
-        {cat}
-      </span>
-      <span className="text-xs tabular-nums text-gray-400">
-        {String(num).padStart(2, "0")} / {String(TOTAL).padStart(2, "0")}
-      </span>
-    </div>
-  );
-}
-
-const Star = ({ filled = true }: { filled?: boolean }) => (
-  <svg viewBox="0 0 20 20" fill={filled ? "#F59E0B" : "#D1D5DB"} className="w-4 h-4">
-    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.957c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.176 0l-3.37 2.448c-.784.57-1.838-.197-1.539-1.118l1.287-3.957a1 1 0 00-.364-1.118L2.063 9.384c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.957z" />
-  </svg>
-);
-
-function Stars({ count = 5 }: { count?: number }) {
-  return (
-    <div className="flex gap-0.5">
-      {Array.from({ length: 5 }, (_, i) => (
-        <Star key={i} filled={i < count} />
+    <span className="flex gap-0.5">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <Star
+          key={i}
+          size={13}
+          className={
+            i <= count
+              ? "fill-[#E8634A] text-[#E8634A]"
+              : "text-gray-300"
+          }
+        />
       ))}
+    </span>
+  );
+}
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="mb-3 text-xs font-medium uppercase tracking-widest text-[#E8634A]">
+      {children}
+    </p>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   FullPage Section Wrapper
+   ═══════════════════════════════════════════ */
+
+function FullPageSection({
+  index,
+  currentSection,
+  children,
+}: {
+  index: number;
+  currentSection: number;
+  children: React.ReactNode;
+}) {
+  const state = index === currentSection ? "active" : index > currentSection ? "below" : "above";
+
+  return (
+    <div className="fullpage-section" data-state={state}>
+      {children}
     </div>
   );
 }
 
-function Check() {
+/* ═══════════════════════════════════════════
+   Section animation wrapper
+   ═══════════════════════════════════════════ */
+
+function AnimatedSection({
+  isActive,
+  variants,
+  className,
+  children,
+}: {
+  isActive: boolean;
+  variants?: Variants;
+  className?: string;
+  children: React.ReactNode;
+}) {
   return (
-    <svg className="w-4 h-4 flex-shrink-0" style={{ color: ACCENT }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-    </svg>
+    <motion.div
+      className={className}
+      initial="hidden"
+      animate={isActive ? "visible" : "hidden"}
+      variants={variants}
+    >
+      {children}
+    </motion.div>
   );
 }
 
-/* ─────────────────────────── PAGE ─────────────────────────── */
-export default function Home() {
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [email, setEmail] = useState("");
+/* ═══════════════════════════════════════════
+   1. Header
+   ═══════════════════════════════════════════ */
 
+const SECTION_NAMES = [
+  "ヒーロー",
+  "課題",
+  "カード型",
+  "カルーセル型",
+  "バッジ型",
+  "集め方Before",
+  "集め方After",
+  "管理画面",
+  "見え方Before",
+  "見え方After",
+  "導入",
+  "機能",
+  "Free",
+  "Pro",
+  "Agency",
+  "FAQ",
+  "登録",
+];
+
+function Header({
+  currentSection,
+  goTo,
+}: {
+  currentSection: number;
+  goTo: (i: number) => void;
+}) {
   return (
-    <div className="min-h-screen bg-[#fafafa]">
-      {/* ── HEADER ── */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <span className="text-xl font-bold" style={{ color: ACCENT }}>
-            KoeLog
-          </span>
-          <nav className="hidden md:flex items-center gap-8 text-sm text-gray-600">
-            <a href="#demo" className="hover:text-gray-900 transition">デモ機能</a>
-            <a href="#pricing" className="hover:text-gray-900 transition">料金</a>
-            <a href="#faq" className="hover:text-gray-900 transition">FAQ</a>
-          </nav>
-          <a
-            href="#waitlist"
-            className="text-white text-sm font-medium px-5 py-2 rounded-lg transition hover:opacity-90"
-            style={{ backgroundColor: ACCENT }}
-          >
-            無料で始める
-          </a>
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        currentSection > 0
+          ? "border-b border-gray-200/60 bg-white/70 backdrop-blur-md shadow-sm"
+          : "border-b border-transparent bg-transparent"
+      }`}
+    >
+      <div className="mx-auto flex max-w-[1100px] items-center justify-between px-6 py-4">
+        <button
+          onClick={() => goTo(0)}
+          className="text-lg font-bold tracking-tight cursor-pointer bg-transparent border-none"
+          style={{ fontFamily: "var(--font-inter)" }}
+        >
+          KoeLog
+        </button>
+        <div className="hidden md:flex items-center gap-6">
+          <button onClick={() => goTo(2)} className="text-sm text-[#374151] hover:text-[#1A1A1A] transition-colors bg-transparent border-none cursor-pointer">デモ</button>
+          <button onClick={() => goTo(11)} className="text-sm text-[#374151] hover:text-[#1A1A1A] transition-colors bg-transparent border-none cursor-pointer">機能</button>
+          <button onClick={() => goTo(12)} className="text-sm text-[#374151] hover:text-[#1A1A1A] transition-colors bg-transparent border-none cursor-pointer">料金</button>
+          <button onClick={() => goTo(15)} className="text-sm text-[#374151] hover:text-[#1A1A1A] transition-colors bg-transparent border-none cursor-pointer">FAQ</button>
         </div>
-      </header>
+        <button
+          onClick={() => goTo(16)}
+          className="rounded-md bg-[#E8634A] px-5 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 cursor-pointer border-none"
+        >
+          無料で始める
+        </button>
+      </div>
+    </header>
+  );
+}
 
-      {/* ── 01 HERO ── */}
-      <section className="py-20 md:py-32">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <SectionLabel cat="KoeLog" num={1} />
-          <h1 className="text-4xl md:text-5xl font-bold text-[#111827] leading-tight">
-            お客様の声を、もっと簡単に。
+/* ═══════════════════════════════════════════
+   2. Hero
+   ═══════════════════════════════════════════ */
+
+function DashboardMock() {
+  return (
+    <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+      <div className="mb-4 flex items-center justify-between">
+        <span className="text-xs font-semibold text-[#1A1A1A]" style={{ fontFamily: "var(--font-inter)" }}>
+          KoeLog Dashboard
+        </span>
+        <span className="rounded-md bg-[#F5F3EF] px-2 py-0.5 text-[10px] text-[#374151]">
+          プロジェクト: サロンA
+        </span>
+      </div>
+      <div className="mb-4 grid grid-cols-3 gap-3">
+        {[
+          { label: "総件数", value: "48" },
+          { label: "承認済み", value: "42" },
+          { label: "平均評価", value: "4.8" },
+        ].map((s) => (
+          <div key={s.label} className="rounded-md border border-gray-100 bg-[#FAFAFA] px-3 py-2">
+            <p className="text-[10px] text-[#374151]">{s.label}</p>
+            <p className="text-lg font-bold text-[#1A1A1A]" style={{ fontFamily: "var(--font-inter)" }}>
+              {s.value}
+            </p>
+          </div>
+        ))}
+      </div>
+      <div className="space-y-2">
+        {testimonials.slice(0, 3).map((t) => (
+          <div key={t.name} className="flex items-center gap-3 rounded-md border border-gray-100 px-3 py-2">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#F5F3EF] text-[11px] font-bold text-[#1A1A1A]">
+              {t.initial}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-xs text-[#1A1A1A]">{t.name}</p>
+              <p className="truncate text-[10px] text-[#374151]">{t.comment}</p>
+            </div>
+            <span className="shrink-0 rounded bg-green-50 px-1.5 py-0.5 text-[10px] font-medium text-green-700">
+              承認済
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Hero({ isActive, goTo }: { isActive: boolean; goTo: (i: number) => void }) {
+  return (
+    <div className="flex h-full items-center px-6">
+      <AnimatedSection isActive={isActive} variants={staggerContainer(0.15)} className="mx-auto grid max-w-[1100px] items-center gap-12 md:grid-cols-[1fr_420px] w-full">
+        <motion.div variants={fadeLeft}>
+          <SectionLabel>お客様の声管理ツール</SectionLabel>
+          <h1 className="mb-5 text-4xl font-bold leading-tight md:text-5xl lg:text-6xl">
+            お客様の声を、
+            <br />
+            もっと簡単に。
           </h1>
-          <p className="mt-6 text-lg text-gray-500 max-w-2xl mx-auto">
-            収集・承認・サイト表示まで、わずか2分。手作業を減らして、信頼を増やす。
+          <p className="mb-8 max-w-md text-lg leading-relaxed text-[#374151]">
+            収集・承認・サイト表示まで、わずか2分。
+            <br />
+            手作業を減らして、信頼を増やす。
           </p>
-          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="#waitlist"
-              className="text-white font-medium px-8 py-3 rounded-lg transition hover:opacity-90"
-              style={{ backgroundColor: ACCENT }}
+          <div className="flex flex-wrap items-center gap-4">
+            <button
+              onClick={() => goTo(16)}
+              className="inline-flex items-center gap-2 rounded-md bg-[#E8634A] px-7 py-3.5 font-medium text-white transition-opacity hover:opacity-90 cursor-pointer border-none"
             >
               無料で始める
-            </a>
-            <a
-              href="#demo"
-              className="border border-gray-300 text-[#111827] font-medium px-8 py-3 rounded-lg hover:border-gray-400 transition"
+              <ArrowRight size={16} />
+            </button>
+            <button
+              onClick={() => goTo(2)}
+              className="text-sm font-medium text-[#374151] underline underline-offset-4 transition-colors hover:text-[#1A1A1A] cursor-pointer bg-transparent border-none"
             >
               デモを見る
-            </a>
+            </button>
           </div>
-        </div>
-      </section>
+        </motion.div>
+        <motion.div className="hidden md:block" variants={fadeRight}>
+          <DashboardMock />
+        </motion.div>
+      </AnimatedSection>
+    </div>
+  );
+}
 
-      {/* ── 02 WIDGET DEMO: Card Grid ── */}
-      <section id="demo" className="py-16 bg-white">
-        <div className="max-w-5xl mx-auto px-4">
-          <SectionLabel cat="ウィジェット" num={2} />
-          <h2 className="text-2xl font-bold text-[#111827] mb-2">カード型レイアウト</h2>
-          <p className="text-gray-500 mb-8">複数の声をグリッドで一覧表示</p>
-          <div className="grid sm:grid-cols-2 gap-4">
-            {[
-              { name: "田中美咲", role: "サロンオーナー", text: "施術後の仕上がりが毎回素晴らしく、友人にも勧めています。", rating: 5 },
-              { name: "佐藤健太", role: "マーケター", text: "予約が取りやすく、スタッフの対応も丁寧です。", rating: 5 },
-              { name: "山田花子", role: "個人事業主", text: "リラックスできる雰囲気で安心しました。", rating: 4 },
-              { name: "鈴木一郎", role: "店舗経営", text: "お客様の声が増えて、集客に繋がっています。", rating: 5 },
-            ].map((r) => (
-              <div key={r.name} className="bg-gray-50 rounded-xl p-5 border border-gray-100">
-                <Stars count={r.rating} />
-                <p className="text-sm text-gray-700 mt-3 leading-relaxed">{r.text}</p>
-                <div className="mt-4 flex items-center gap-3">
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white"
-                    style={{ backgroundColor: ACCENT }}
-                  >
-                    {r.name[0]}
+/* ═══════════════════════════════════════════
+   3. Pain Points
+   ═══════════════════════════════════════════ */
+
+function CountUp({ target, suffix, isActive }: { target: number; suffix: string; isActive: boolean }) {
+  const [count, setCount] = useState(0);
+  const hasAnimated = useRef(false);
+
+  useEffect(() => {
+    if (!isActive || hasAnimated.current) return;
+    hasAnimated.current = true;
+    const duration = 1200;
+    const start = performance.now();
+    const step = (now: number) => {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.round(eased * target));
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [isActive, target]);
+
+  return <span>{count}{suffix}</span>;
+}
+
+function PainPoints({ isActive }: { isActive: boolean }) {
+  const points = [
+    { num: 70, suffix: "%", text: "の事業者がお客様の声の収集に課題を感じている" },
+    { num: 2, suffix: "分", text: "KoeLogなら収集からサイト表示まで" },
+    { num: 1, suffix: "行", text: "のコードでどんなサイトにも埋め込み可能" },
+  ];
+
+  return (
+    <div className="flex h-full items-center border-t border-gray-200 bg-[#F5F3EF] px-6">
+      <AnimatedSection isActive={isActive} variants={staggerContainer(0.1)} className="mx-auto max-w-[1100px] w-full">
+        <div className="grid gap-12 md:grid-cols-3">
+          {points.map((p) => (
+            <motion.div key={p.suffix + p.num} variants={fadeUp}>
+              <p
+                className="mb-2 text-4xl font-bold text-[#E8634A]"
+                style={{ fontFamily: "var(--font-inter)" }}
+              >
+                <CountUp target={p.num} suffix={p.suffix} isActive={isActive} />
+              </p>
+              <p className="text-lg font-semibold leading-relaxed" style={{ color: '#111827' }}>{p.text}</p>
+            </motion.div>
+          ))}
+        </div>
+      </AnimatedSection>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   4. Widget Demo — Card
+   ═══════════════════════════════════════════ */
+
+function WidgetBrowserFrame({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="rounded-lg border border-gray-200 bg-white">
+      <div className="flex items-center gap-1.5 border-b border-gray-100 px-3 md:px-4 py-2">
+        <span className="h-2 w-2 md:h-2.5 md:w-2.5 rounded-full bg-gray-300" />
+        <span className="h-2 w-2 md:h-2.5 md:w-2.5 rounded-full bg-gray-300" />
+        <span className="h-2 w-2 md:h-2.5 md:w-2.5 rounded-full bg-gray-300" />
+        <span className="ml-2 md:ml-3 text-[10px] md:text-[11px] text-[#374151]">your-website.com</span>
+      </div>
+      <div className="p-4 sm:p-8">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function WidgetDemoCard({ isActive }: { isActive: boolean }) {
+  return (
+    <div className="flex h-full items-center px-4 md:px-6">
+      <AnimatedSection isActive={isActive} variants={staggerContainer(0.15)} className="mx-auto max-w-[1100px] w-full">
+        <motion.div variants={fadeUp}>
+          <div className="flex items-center justify-between">
+            <SectionLabel>サイトでの表示イメージ</SectionLabel>
+            <span className="text-xs text-[#374151]">1/3</span>
+          </div>
+          <h2 className="mb-2 md:mb-3 text-lg font-bold md:text-4xl">カード型レイアウト</h2>
+          <p className="mb-4 md:mb-8 max-w-md text-xs md:text-base leading-relaxed text-[#374151]">
+            複数の声をグリッドで一覧表示
+          </p>
+        </motion.div>
+
+        <motion.div variants={scaleUp}>
+          <WidgetBrowserFrame>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {testimonials.map((t) => (
+                <div key={t.name} className="rounded-md border border-gray-200 bg-white p-4">
+                  <div className="mb-2.5 flex items-center gap-2.5">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#F5F3EF] text-xs font-bold text-[#1A1A1A]">
+                      {t.initial}
+                    </span>
+                    <div>
+                      <p className="text-sm font-medium text-[#1A1A1A]">{t.name}</p>
+                      <Stars count={t.rating} />
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-[#111827]">{r.name}</p>
-                    <p className="text-xs text-gray-400">{r.role}</p>
+                  <p className="text-sm leading-relaxed text-[#374151]">{t.comment}</p>
+                </div>
+              ))}
+            </div>
+          </WidgetBrowserFrame>
+        </motion.div>
+      </AnimatedSection>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   5. Widget Demo — Carousel
+   ═══════════════════════════════════════════ */
+
+function WidgetDemoCarousel({ isActive }: { isActive: boolean }) {
+  const [current, setCurrent] = useState(0);
+  const len = testimonials.length;
+  const next = useCallback(() => setCurrent((c) => (c + 1) % len), [len]);
+  const prev = () => setCurrent((c) => (c - 1 + len) % len);
+
+  useEffect(() => {
+    if (!isActive) return;
+    const id = setInterval(next, 4000);
+    return () => clearInterval(id);
+  }, [next, isActive]);
+
+  const t = testimonials[current];
+
+  return (
+    <div className="flex h-full items-center bg-[#F5F3EF] px-4 md:px-6">
+      <AnimatedSection isActive={isActive} variants={staggerContainer(0.15)} className="mx-auto max-w-[1100px] w-full">
+        <motion.div variants={fadeUp}>
+          <div className="flex items-center justify-between">
+            <SectionLabel>サイトでの表示イメージ</SectionLabel>
+            <span className="text-xs text-[#374151]">2/3</span>
+          </div>
+          <h2 className="mb-2 md:mb-3 text-lg font-bold md:text-4xl">カルーセル型</h2>
+          <p className="mb-4 md:mb-8 max-w-md text-xs md:text-base leading-relaxed text-[#374151]">
+            1件ずつスライドして表示
+          </p>
+        </motion.div>
+
+        <motion.div variants={scaleUp}>
+          <WidgetBrowserFrame>
+            <div className="relative mx-auto max-w-sm">
+              <div className="rounded-md border border-gray-200 bg-white p-6 text-center">
+                <span className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#F5F3EF] text-sm font-bold text-[#1A1A1A]">
+                  {t.initial}
+                </span>
+                <div className="mb-3 flex justify-center">
+                  <Stars count={t.rating} />
+                </div>
+                <p className="mb-3 text-sm leading-relaxed text-[#374151]">
+                  &ldquo;{t.comment}&rdquo;
+                </p>
+                <p className="text-sm font-medium text-[#1A1A1A]">{t.name}</p>
+                <p className="text-xs text-[#374151]">{t.role}</p>
+              </div>
+
+              <button
+                onClick={prev}
+                aria-label="前へ"
+                className="absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-gray-200 bg-white p-1.5 transition-colors hover:bg-gray-50"
+              >
+                <ChevronLeft size={14} className="text-[#374151]" />
+              </button>
+              <button
+                onClick={next}
+                aria-label="次へ"
+                className="absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 rounded-full border border-gray-200 bg-white p-1.5 transition-colors hover:bg-gray-50"
+              >
+                <ChevronRight size={14} className="text-[#374151]" />
+              </button>
+
+              <div className="mt-4 flex justify-center gap-1.5">
+                {testimonials.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrent(i)}
+                    aria-label={`${i + 1}番目`}
+                    className={`h-1.5 rounded-full transition-all ${
+                      i === current ? "w-4 bg-[#E8634A]" : "w-1.5 bg-gray-300"
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+          </WidgetBrowserFrame>
+        </motion.div>
+      </AnimatedSection>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   6. Widget Demo — Badge
+   ═══════════════════════════════════════════ */
+
+function WidgetDemoBadge({ isActive }: { isActive: boolean }) {
+  const avg = (
+    testimonials.reduce((s, t) => s + t.rating, 0) / testimonials.length
+  ).toFixed(1);
+
+  return (
+    <div className="flex h-full items-center px-4 md:px-6">
+      <AnimatedSection isActive={isActive} variants={staggerContainer(0.15)} className="mx-auto max-w-[1100px] w-full">
+        <motion.div variants={fadeUp}>
+          <div className="flex items-center justify-between">
+            <SectionLabel>サイトでの表示イメージ</SectionLabel>
+            <span className="text-xs text-[#374151]">3/3</span>
+          </div>
+          <h2 className="mb-2 md:mb-3 text-lg font-bold md:text-4xl">バッジ型</h2>
+          <p className="mb-4 md:mb-8 max-w-md text-xs md:text-base leading-relaxed text-[#374151]">
+            コンパクトに評価スコアを表示
+          </p>
+        </motion.div>
+
+        <motion.div variants={scaleUp}>
+          <WidgetBrowserFrame>
+            <div className="flex justify-center py-8">
+              <div className="inline-flex items-center gap-3 rounded-lg border border-gray-200 bg-white px-8 py-5 shadow-sm">
+                <span className="flex gap-1">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <Star
+                      key={i}
+                      size={22}
+                      className={
+                        i <= Math.round(Number(avg))
+                          ? "fill-[#E8634A] text-[#E8634A]"
+                          : "text-gray-300"
+                      }
+                    />
+                  ))}
+                </span>
+                <span className="text-2xl font-bold text-[#1A1A1A]" style={{ fontFamily: "var(--font-inter)" }}>
+                  {avg}
+                </span>
+                <span className="text-base text-[#374151]">/ {testimonials.length}件</span>
+              </div>
+            </div>
+          </WidgetBrowserFrame>
+        </motion.div>
+      </AnimatedSection>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   7. Before Collect (集め方)
+   ═══════════════════════════════════════════ */
+
+const collectStepsBefore = [
+  "Googleフォームを作成",
+  "顧客にURLを送る",
+  "回答をExcelにコピー",
+  "良い声だけ選別",
+  "テキストを整形",
+  "サイトにコピペ",
+  "デザインを調整",
+];
+
+function BeforeCollect({ isActive }: { isActive: boolean }) {
+  return (
+    <div className="flex h-full items-center border-t border-gray-200 bg-[#FAFAF8] px-4 md:px-6">
+      <AnimatedSection isActive={isActive} variants={staggerContainer(0.1)} className="mx-auto max-w-[700px] w-full">
+        <motion.div variants={fadeUp}>
+          <div className="flex items-center justify-between">
+            <SectionLabel>集め方の比較</SectionLabel>
+            <span className="text-xs text-[#374151]">1/4</span>
+          </div>
+          <h2 className="mb-2 md:mb-3 text-lg font-bold md:text-2xl">今の集め方</h2>
+          <p className="mb-3 md:mb-4 max-w-md text-xs md:text-sm leading-relaxed text-[#374151]">
+            こんな手間、かけていませんか？
+          </p>
+        </motion.div>
+
+        <motion.div variants={fadeUp}>
+          <div className="rounded-lg border border-gray-200 bg-[#F3F3F0] p-3 md:p-6">
+            <div className="grid grid-cols-2 gap-2 md:gap-3">
+              {collectStepsBefore.map((step, i) => (
+                <div key={i} className="flex items-center gap-2 rounded-md bg-white border border-gray-300 px-3 py-1.5">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gray-200 text-[10px] font-bold text-gray-500">
+                    {i + 1}
+                  </span>
+                  <span className="text-xs md:text-sm text-[#374151]">{step}</span>
+                </div>
+              ))}
+              <div className="flex items-center justify-center rounded-md bg-gray-100 px-3 py-1.5">
+                <span className="text-xs text-gray-400">毎回これを繰り返す…</span>
+              </div>
+            </div>
+            <p className="mt-3 text-center text-xs md:text-sm text-gray-400">
+              7ステップ、毎回この手間は大変…
+            </p>
+          </div>
+        </motion.div>
+      </AnimatedSection>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   8. After Collect (集め方)
+   ═══════════════════════════════════════════ */
+
+const collectStepsAfter = [
+  "フォームURLを顧客に送る",
+  "ダッシュボードで「承認」をクリック",
+  "サイトに自動表示",
+];
+
+function AfterCollect({ isActive }: { isActive: boolean }) {
+  return (
+    <div className="flex h-full items-center px-4 md:px-6">
+      <AnimatedSection isActive={isActive} variants={staggerContainer(0.1)} className="mx-auto max-w-[700px] w-full">
+        <motion.div variants={fadeUp}>
+          <div className="flex items-center justify-between">
+            <SectionLabel>集め方の比較</SectionLabel>
+            <span className="text-xs text-[#374151]">2/4</span>
+          </div>
+          <h2 className="mb-2 md:mb-3 text-2xl font-bold md:text-4xl">KoeLogなら</h2>
+          <p className="mb-4 md:mb-8 max-w-md text-xs md:text-base leading-relaxed text-[#374151]">
+            たった3ステップで完了
+          </p>
+        </motion.div>
+
+        <motion.div variants={fadeUp}>
+          <div className="rounded-lg border border-gray-200 bg-white p-4 md:p-8">
+            <div className="space-y-0">
+              {collectStepsAfter.map((step, i) => (
+                <div key={i}>
+                  <div className="flex items-center gap-3 rounded-md border border-[#E8634A]/20 bg-[#FEF7F5] px-4 py-4">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#E8634A] text-xs font-bold text-white">
+                      <CheckCircle size={16} />
+                    </span>
+                    <span className="text-sm md:text-base font-medium text-[#1A1A1A]">{step}</span>
                   </div>
+                  {i < collectStepsAfter.length - 1 && (
+                    <div className="flex justify-center py-1">
+                      <span className="text-[#E8634A] text-lg">↓</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+            <p className="mt-4 text-center text-xs md:text-sm text-[#E8634A] font-medium">
+              7ステップ → 3ステップに短縮
+            </p>
+          </div>
+        </motion.div>
+      </AnimatedSection>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   8b. Dashboard Preview (管理画面)
+   ═══════════════════════════════════════════ */
+
+function DashboardPreview({ isActive }: { isActive: boolean }) {
+  const dashboardVoices = [
+    { name: "田中 美咲", initial: "田", bg: "bg-pink-100", text: "text-pink-600", rating: 5, comment: "施術後の仕上がりが毎回素晴らしく…", status: "承認済み", statusColor: "bg-green-50 text-green-700" },
+    { name: "山田 花子", initial: "山", bg: "bg-purple-100", text: "text-purple-600", rating: 4, comment: "初めてでしたが、リラックスできる…", status: "未承認", statusColor: "bg-orange-50 text-orange-700" },
+    { name: "高橋 由美", initial: "高", bg: "bg-amber-100", text: "text-amber-600", rating: 3, comment: "待ち時間が少し長かった…", status: "非公開", statusColor: "bg-gray-100 text-gray-500" },
+  ];
+
+  return (
+    <div className="flex h-full items-center bg-[#FAFAF8] px-4 md:px-6">
+      <AnimatedSection isActive={isActive} variants={staggerContainer(0.15)} className="mx-auto max-w-[700px] w-full">
+        <motion.div variants={fadeUp}>
+          <SectionLabel>管理画面</SectionLabel>
+          <h2 className="mb-1 md:mb-2 text-xl font-bold md:text-3xl">直感的なダッシュボード</h2>
+          <p className="mb-3 md:mb-6 max-w-md text-xs md:text-sm leading-relaxed text-[#374151]">
+            声の収集・承認・分析をひとつの画面で
+          </p>
+        </motion.div>
+
+        <motion.div variants={scaleUp}>
+          {/* Browser Frame */}
+          <div className="rounded-lg border border-gray-200 bg-white">
+            <div className="flex items-center gap-1.5 border-b border-gray-100 px-3 md:px-4 py-2">
+              <span className="h-2 w-2 md:h-2.5 md:w-2.5 rounded-full bg-gray-300" />
+              <span className="h-2 w-2 md:h-2.5 md:w-2.5 rounded-full bg-gray-300" />
+              <span className="h-2 w-2 md:h-2.5 md:w-2.5 rounded-full bg-gray-300" />
+              <span className="ml-2 md:ml-3 text-[10px] md:text-[11px] text-[#374151]">app.koelog.jp/dashboard</span>
+            </div>
+            <div className="p-3 md:p-5 bg-[#FAFAFA]">
+              {/* Header bar */}
+              <div className="flex items-center justify-between mb-3 md:mb-4">
+                <span className="text-xs md:text-sm font-bold text-[#1A1A1A]">ダッシュボード</span>
+                <span className="rounded bg-[#F5F3EF] px-2 py-0.5 text-[9px] md:text-[10px] text-[#374151]">Beauty Salon Aoi</span>
+              </div>
+
+              {/* Stats Cards */}
+              <div className="grid grid-cols-3 gap-2 md:gap-3 mb-3 md:mb-4">
+                {[
+                  { label: "総件数", value: "24", unit: "件" },
+                  { label: "平均評価", value: "4.8", unit: "" },
+                  { label: "今月", value: "3", unit: "件" },
+                ].map((s) => (
+                  <div key={s.label} className="rounded-md border border-gray-200 bg-white px-2 md:px-3 py-2 md:py-3">
+                    <p className="text-[9px] md:text-[10px] text-[#374151]">{s.label}</p>
+                    <p className="text-sm md:text-lg font-bold text-[#1A1A1A]" style={{ fontFamily: "var(--font-inter)" }}>
+                      {s.value}
+                      {s.unit && <span className="text-[9px] md:text-xs font-normal text-gray-400 ml-0.5">{s.unit}</span>}
+                    </p>
+                    {s.label === "平均評価" && (
+                      <div className="flex gap-0.5 mt-0.5">
+                        {[1,2,3,4,5].map(i => (
+                          <Star key={i} size={8} className={i <= 4 ? "fill-[#E8634A] text-[#E8634A]" : "text-gray-300"} />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Voice List */}
+              <div className="rounded-md border border-gray-200 bg-white">
+                <div className="flex items-center justify-between px-2 md:px-3 py-1.5 md:py-2 border-b border-gray-100">
+                  <span className="text-[10px] md:text-xs font-bold text-[#1A1A1A]">最近の声</span>
+                  <span className="text-[9px] md:text-[10px] text-[#E8634A]">すべて見る →</span>
+                </div>
+                <div className="divide-y divide-gray-50">
+                  {dashboardVoices.map((v) => (
+                    <div key={v.name} className="flex items-center gap-2 md:gap-3 px-2 md:px-3 py-1.5 md:py-2">
+                      <span className={`flex h-5 w-5 md:h-6 md:w-6 shrink-0 items-center justify-center rounded-full ${v.bg} ${v.text} text-[8px] md:text-[10px] font-bold`}>
+                        {v.initial}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[10px] md:text-xs font-medium text-[#1A1A1A]">{v.name}</span>
+                          <span className="flex gap-0.5">
+                            {[1,2,3,4,5].map(i => (
+                              <Star key={i} size={7} className={i <= v.rating ? "fill-[#E8634A] text-[#E8634A]" : "text-gray-300"} />
+                            ))}
+                          </span>
+                        </div>
+                        <p className="truncate text-[9px] md:text-[10px] text-[#374151]">{v.comment}</p>
+                      </div>
+                      <span className={`shrink-0 rounded px-1.5 py-0.5 text-[8px] md:text-[9px] font-medium ${v.statusColor}`}>
+                        {v.status}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 03 WIDGET DEMO: Carousel ── */}
-      <section className="py-16">
-        <div className="max-w-5xl mx-auto px-4">
-          <SectionLabel cat="ウィジェット" num={3} />
-          <h2 className="text-2xl font-bold text-[#111827] mb-2">カルーセル型</h2>
-          <p className="text-gray-500 mb-8">1件ずつスライドして表示</p>
-          <div className="max-w-lg mx-auto bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
-            <Stars count={5} />
-            <p className="mt-4 text-gray-700 leading-relaxed">
-              施術後の仕上がりが毎回素晴らしく、友人にも勧めています。予約もスムーズで助かっています。
-            </p>
-            <div className="mt-6 flex items-center justify-center gap-3">
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
-                style={{ backgroundColor: ACCENT }}
-              >
-                田
-              </div>
-              <div className="text-left">
-                <p className="text-sm font-medium text-[#111827]">田中美咲</p>
-                <p className="text-xs text-gray-400">エステサロン経営</p>
-              </div>
-            </div>
-            <div className="flex justify-center gap-2 mt-6">
-              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: ACCENT }} />
-              <span className="w-2 h-2 rounded-full bg-gray-200" />
-              <span className="w-2 h-2 rounded-full bg-gray-200" />
             </div>
           </div>
-        </div>
-      </section>
+        </motion.div>
+      </AnimatedSection>
+    </div>
+  );
+}
 
-      {/* ── 04 WIDGET DEMO: Badge ── */}
-      <section className="py-16 bg-white">
-        <div className="max-w-5xl mx-auto px-4">
-          <SectionLabel cat="ウィジェット" num={4} />
-          <h2 className="text-2xl font-bold text-[#111827] mb-2">バッジ型</h2>
-          <p className="text-gray-500 mb-8">コンパクトに評価スコアを表示</p>
-          <div className="flex justify-center">
-            <div className="inline-flex items-center gap-3 bg-gray-50 rounded-full px-6 py-3 border border-gray-100 shadow-sm">
-              <Star />
-              <span className="text-lg font-bold text-[#111827]">4.8</span>
-              <span className="text-gray-300">|</span>
-              <span className="text-sm text-gray-500">48件のレビュー</span>
-            </div>
+/* ═══════════════════════════════════════════
+   9. Before Display (見え方)
+   ═══════════════════════════════════════════ */
+
+function BeforeDisplay({ isActive }: { isActive: boolean }) {
+  return (
+    <div className="flex h-full items-center border-t border-gray-200 bg-[#FAFAF8] px-4 md:px-6">
+      <AnimatedSection isActive={isActive} variants={staggerContainer(0.15)} className="mx-auto max-w-[700px] w-full">
+        <motion.div variants={fadeUp}>
+          <div className="flex items-center justify-between">
+            <SectionLabel>サイト表示の比較</SectionLabel>
+            <span className="text-xs text-[#374151]">3/4</span>
           </div>
-        </div>
-      </section>
-
-      {/* ── 05 BEFORE: 集め方 (7 steps, 2-col grid compact) ── */}
-      <section className="py-16">
-        <div className="max-w-5xl mx-auto px-4">
-          <SectionLabel cat="Before — 集め方" num={5} />
-          <h2 className="text-2xl font-bold text-[#111827] mb-2">今の集め方</h2>
-          <p className="text-gray-500 mb-8">
-            毎回これを繰り返す…7ステップ、毎回この手間は大変…
+          <h2 className="mb-2 md:mb-3 text-2xl font-bold md:text-4xl">今のサイト表示</h2>
+          <p className="mb-4 md:mb-8 max-w-md text-xs md:text-base leading-relaxed text-[#374151]">
+            テキストだけの味気ない表示になっていませんか？
           </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {[
-              "Googleフォームを作成",
-              "顧客にURLを送る",
-              "回答をExcelにコピー",
-              "良い声だけ選別",
-              "テキストを整形",
-              "サイトにコピペ",
-              "デザインを調整",
-            ].map((step, i) => (
-              <div
-                key={i}
-                className="bg-white rounded-xl border border-gray-200 p-3 flex items-start gap-2"
-              >
-                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-gray-200 text-gray-500 text-xs font-bold flex items-center justify-center">
-                  {i + 1}
-                </span>
-                <span className="text-sm text-gray-700 leading-snug">{step}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+        </motion.div>
 
-      {/* ── 06 AFTER: 集め方 (3 steps) ── */}
-      <section className="py-16 bg-white">
-        <div className="max-w-5xl mx-auto px-4">
-          <SectionLabel cat="After — 集め方" num={6} />
-          <h2 className="text-2xl font-bold text-[#111827] mb-2">KoeLogなら</h2>
-          <p className="text-gray-500 mb-8">7ステップ → 3ステップに短縮</p>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { title: "フォームURLを顧客に送る", desc: "自動生成されるフォームを共有するだけ" },
-              { title: "ダッシュボードで「承認」をクリック", desc: "ワンクリックで掲載をコントロール" },
-              { title: "サイトに自動表示", desc: "埋め込みコードで全自動" },
-            ].map((s, i) => (
-              <div key={i} className="rounded-xl p-6 border" style={{ backgroundColor: "#fdf5f0", borderColor: "#fbe8dc" }}>
-                <span
-                  className="inline-flex items-center justify-center w-8 h-8 rounded-full text-white text-sm font-bold"
-                  style={{ backgroundColor: ACCENT }}
-                >
-                  {i + 1}
-                </span>
-                <h3 className="mt-4 font-semibold text-[#111827]">{s.title}</h3>
-                <p className="mt-2 text-sm text-gray-500">{s.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 07 BEFORE: 見え方 ── */}
-      <section className="py-16">
-        <div className="max-w-5xl mx-auto px-4">
-          <SectionLabel cat="Before — 見え方" num={7} />
-          <h2 className="text-2xl font-bold text-[#111827] mb-2">今のサイト表示</h2>
-          <p className="text-gray-500 mb-8">テキストだけの味気ない表示になっていませんか？</p>
-          <div className="max-w-lg mx-auto bg-white rounded-xl border border-gray-200 p-6">
-            <p className="text-sm font-medium text-gray-400 mb-4">Googleフォームの回答</p>
-            {[
-              "「とても良かったです」 — 田中",
-              "「また利用したいです」 — 佐藤",
-              "「スタッフが丁寧でした」 — 山田",
-            ].map((t, i) => (
-              <p key={i} className="text-sm text-gray-500 py-2 border-b border-gray-100 last:border-0">
-                {t}
-              </p>
-            ))}
-            <p className="mt-4 text-xs text-red-400 text-center">
+        <motion.div variants={fadeUp}>
+          <div className="rounded-lg border border-gray-200 bg-gray-100 p-4 md:p-8">
+            <div className="mb-3 md:mb-4 rounded border border-gray-300 bg-white px-3 md:px-4 py-2 md:py-3 text-left text-xs md:text-sm text-[#374151]">
+              Googleフォーム - お客様の声
+            </div>
+            <div className="space-y-2 md:space-y-3">
+              {["まあ良かったです。", "対応が丁寧でした。", "また利用したいです。"].map(
+                (text) => (
+                  <div key={text} className="rounded border border-gray-300 bg-white p-3 md:p-4">
+                    <p className="text-xs md:text-sm text-[#374151]">回答:</p>
+                    <p className="text-sm md:text-base text-[#1A1A1A]">{text}</p>
+                  </div>
+                )
+              )}
+            </div>
+            <p className="mt-4 md:mt-6 text-center text-xs md:text-sm text-[#374151]">
               テキストだけで、信頼感が伝わらない…
             </p>
           </div>
-        </div>
-      </section>
+        </motion.div>
+      </AnimatedSection>
+    </div>
+  );
+}
 
-      {/* ── 08 AFTER: 見え方 ── */}
-      <section className="py-16 bg-white">
-        <div className="max-w-5xl mx-auto px-4">
-          <SectionLabel cat="After — 見え方" num={8} />
-          <h2 className="text-2xl font-bold text-[#111827] mb-2">KoeLogならこう変わる</h2>
-          <p className="text-gray-500 mb-8">写真付き・星評価・デザイン統一</p>
-          <div className="max-w-lg mx-auto space-y-4">
-            {[
-              { name: "田中美咲", text: "施術後の仕上がりが毎回素晴らしく、友人にも勧めています。" },
-              { name: "佐藤健太", text: "予約が取りやすく、スタッフの対応も丁寧です。" },
-              { name: "山田花子", text: "リラックスできる雰囲気で安心しました。" },
-            ].map((r) => (
-              <div key={r.name} className="bg-gray-50 rounded-xl p-5 border border-gray-100 flex gap-4">
-                <div
-                  className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
-                  style={{ backgroundColor: ACCENT }}
-                >
-                  {r.name[0]}
-                </div>
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-sm font-medium text-[#111827]">{r.name}</span>
-                    <Stars count={5} />
-                  </div>
-                  <p className="text-sm text-gray-600 leading-relaxed">{r.text}</p>
-                </div>
-              </div>
-            ))}
+/* ═══════════════════════════════════════════
+   10. After Display (見え方)
+   ═══════════════════════════════════════════ */
+
+function AfterDisplay({ isActive }: { isActive: boolean }) {
+  return (
+    <div className="flex h-full items-center px-4 md:px-6">
+      <AnimatedSection isActive={isActive} variants={staggerContainer(0.15)} className="mx-auto max-w-[700px] w-full">
+        <motion.div variants={fadeUp}>
+          <div className="flex items-center justify-between">
+            <SectionLabel>サイト表示の比較</SectionLabel>
+            <span className="text-xs text-[#374151]">4/4</span>
           </div>
-        </div>
-      </section>
+          <h2 className="mb-2 md:mb-3 text-2xl font-bold md:text-4xl">
+            KoeLogならこう変わる
+          </h2>
+          <p className="mb-4 md:mb-8 max-w-md text-xs md:text-base leading-relaxed text-[#374151]">
+            写真付き・星評価・デザイン統一
+          </p>
+        </motion.div>
 
-      {/* ── 09 MANAGEMENT DASHBOARD ── */}
-      <section className="py-16">
-        <div className="max-w-5xl mx-auto px-4">
-          <SectionLabel cat="管理画面プレビュー" num={9} />
-          <h2 className="text-2xl font-bold text-[#111827] mb-2">直感的なダッシュボード</h2>
-          <p className="text-gray-500 mb-8">声の収集・承認・分析をひとつの画面で</p>
-          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-            <div className="bg-gray-100 px-4 py-2 flex items-center gap-2 text-xs text-gray-400 border-b border-gray-200">
-              <div className="flex gap-1.5">
-                <span className="w-3 h-3 rounded-full bg-red-300" />
-                <span className="w-3 h-3 rounded-full bg-yellow-300" />
-                <span className="w-3 h-3 rounded-full bg-green-300" />
-              </div>
-              <span className="ml-2">app.koelog.jp/dashboard</span>
-            </div>
-            <div className="p-6">
-              <h3 className="font-semibold text-[#111827] mb-4">Beauty Salon Aoi</h3>
-              <div className="grid grid-cols-3 gap-4 mb-6">
-                {[
-                  { label: "総件数", value: "24件" },
-                  { label: "平均評価", value: "4.8" },
-                  { label: "今月", value: "3件" },
-                ].map((m) => (
-                  <div key={m.label} className="bg-gray-50 rounded-lg p-3 text-center">
-                    <p className="text-lg font-bold text-[#111827]">{m.value}</p>
-                    <p className="text-xs text-gray-500">{m.label}</p>
-                  </div>
-                ))}
-              </div>
-              <div className="space-y-3">
-                {[
-                  { name: "田中美咲", text: "施術後の仕上がりが毎回素晴らしく…", status: "承認済み", color: "green" as const },
-                  { name: "佐藤健太", text: "予約が取りやすく、スタッフの対応も…", status: "未承認", color: "yellow" as const },
-                  { name: "山田花子", text: "初めてでしたが、リラックスできる…", status: "非公開", color: "gray" as const },
-                ].map((r) => (
-                  <div key={r.name} className="flex items-center justify-between bg-gray-50 rounded-lg p-3">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold"
-                        style={{ backgroundColor: ACCENT }}
-                      >
-                        {r.name[0]}
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-[#111827]">{r.name}</p>
-                        <p className="text-xs text-gray-400">{r.text}</p>
-                      </div>
-                    </div>
-                    <span
-                      className={`text-xs px-2 py-0.5 rounded-full ${
-                        r.color === "green"
-                          ? "bg-green-100 text-green-700"
-                          : r.color === "yellow"
-                          ? "bg-yellow-100 text-yellow-700"
-                          : "bg-gray-100 text-gray-500"
-                      }`}
-                    >
-                      {r.status}
+        <motion.div variants={fadeUp}>
+          <div className="rounded-lg border border-gray-200 bg-white p-4 md:p-8">
+            <div className="space-y-3 md:space-y-4">
+              {testimonials.slice(0, 3).map((t) => (
+                <div key={t.name} className="rounded-md border border-gray-100 p-3 md:p-4">
+                  <div className="flex items-center gap-2.5">
+                    <span className="flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-full bg-[#F5F3EF] text-xs md:text-sm font-bold text-[#1A1A1A]">
+                      {t.initial}
                     </span>
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-[#1A1A1A]">{t.name}</p>
+                      <Stars count={t.rating} />
+                    </div>
                   </div>
-                ))}
-              </div>
+                  <p className="mt-2 text-sm md:text-base leading-relaxed text-[#374151]">
+                    {t.comment}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
-      </section>
+        </motion.div>
+      </AnimatedSection>
+    </div>
+  );
+}
 
-      {/* ── 10 FEATURES ── */}
-      <section className="py-16 bg-white">
-        <div className="max-w-5xl mx-auto px-4">
-          <SectionLabel cat="機能" num={10} />
-          <h2 className="text-2xl font-bold text-[#111827] text-center mb-12">主な機能</h2>
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {[
-              { icon: "📋", title: "収集フォーム", desc: "URLを共有するだけ。お客様がフォームから声を投稿できます。" },
-              { icon: "✅", title: "ワンクリック承認", desc: "管理画面から承認・非承認をワンクリックで切り替え。" },
-              { icon: "🧩", title: "埋め込みウィジェット", desc: "スクリプトタグ1行でサイトにお客様の声を表示。" },
-              { icon: "🎨", title: "カスタムデザイン", desc: "カラー・レイアウト・フォントを自由にカスタマイズ。" },
-              { icon: "🔒", title: "承認フロー", desc: "掲載前に必ず承認ステップ。不適切な投稿を防止。" },
-              { icon: "📊", title: "CSVエクスポート", desc: "収集した声をCSV形式でいつでもダウンロード可能。" },
-            ].map((f) => (
-              <div key={f.title} className="bg-gray-50 rounded-xl p-6 border border-gray-100">
-                <span className="text-2xl">{f.icon}</span>
-                <h3 className="mt-3 font-semibold text-[#111827]">{f.title}</h3>
-                <p className="mt-2 text-sm text-gray-500 leading-relaxed">{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+/* ═══════════════════════════════════════════
+   9. Steps
+   ═══════════════════════════════════════════ */
 
-      {/* ── 11 PRICING (3 plans) ── */}
-      <section id="pricing" className="py-16">
-        <div className="max-w-5xl mx-auto px-4">
-          <SectionLabel cat="料金" num={11} />
-          <h2 className="text-2xl font-bold text-[#111827] text-center mb-12">料金プラン</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {([
-              {
-                name: "Free",
-                price: "¥0",
-                period: "",
-                features: ["プロジェクト1件", "お客様の声10件", "基本ウィジェット"],
-                rec: false,
-              },
-              {
-                name: "Pro",
-                price: "¥1,980",
-                period: "/月（税込）",
-                features: ["プロジェクト3件", "お客様の声100件", "カスタムデザイン", "優先サポート"],
-                rec: true,
-              },
-              {
-                name: "Agency",
-                price: "¥3,980",
-                period: "/月（税込）",
-                features: ["プロジェクト無制限", "お客様の声無制限", "カスタムデザイン", "優先サポート", "API アクセス"],
-                rec: false,
-              },
-            ] as const).map((plan) => (
-              <div
-                key={plan.name}
-                className={`rounded-2xl p-6 border flex flex-col bg-white ${
-                  plan.rec ? "border-2 shadow-lg relative" : "border-gray-200"
-                }`}
-                style={plan.rec ? { borderColor: ACCENT } : undefined}
-              >
-                {plan.rec && (
-                  <span
-                    className="absolute -top-3 left-1/2 -translate-x-1/2 text-white text-xs font-semibold px-3 py-1 rounded-full"
-                    style={{ backgroundColor: ACCENT }}
-                  >
-                    おすすめ
-                  </span>
-                )}
-                <h3 className="text-lg font-bold text-[#111827]">{plan.name}</h3>
-                <p className="mt-4">
-                  <span className="text-3xl font-bold text-[#111827]">{plan.price}</span>
-                  <span className="text-sm text-[#111827] font-medium">{plan.period}</span>
-                </p>
-                <ul className="mt-6 space-y-3 flex-1">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm text-[#111827] font-medium">
-                      <Check />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <a
-                  href="#waitlist"
-                  className={`mt-8 block text-center py-2.5 rounded-lg text-sm font-medium transition ${
-                    plan.rec ? "text-white hover:opacity-90" : "bg-gray-100 text-[#111827] hover:bg-gray-200"
-                  }`}
-                  style={plan.rec ? { backgroundColor: ACCENT } : undefined}
+function Steps({ isActive }: { isActive: boolean }) {
+  const steps = [
+    {
+      num: "1",
+      title: "フォームURLを共有",
+      desc: "自動生成されるフォームURLをお客様にシェアするだけ。",
+      icon: FileText,
+    },
+    {
+      num: "2",
+      title: "ワンクリック承認",
+      desc: "届いた声を管理画面で承認。掲載内容をコントロール。",
+      icon: CheckCircle,
+    },
+    {
+      num: "3",
+      title: "サイトに自動表示",
+      desc: "埋め込みコードをコピペ。あとは全自動。",
+      icon: Code,
+    },
+  ];
+
+  return (
+    <div className="flex h-full items-center px-6">
+      <AnimatedSection isActive={isActive} variants={staggerContainer(0.15)} className="mx-auto max-w-[1100px] w-full">
+        <motion.div variants={fadeUp}>
+          <SectionLabel>導入フロー</SectionLabel>
+          <h2 className="mb-6 md:mb-12 text-2xl font-bold md:text-4xl">
+            3ステップで完了
+          </h2>
+        </motion.div>
+
+        <div className="grid gap-12 md:grid-cols-3">
+          {steps.map((s) => (
+            <motion.div key={s.num} variants={fadeUp}>
+              <div className="mb-4 flex items-center gap-3">
+                <span
+                  className="flex h-9 w-9 items-center justify-center rounded-md bg-[#F5F3EF] text-sm font-bold text-[#E8634A]"
+                  style={{ fontFamily: "var(--font-inter)" }}
                 >
-                  始める
-                </a>
+                  {s.num}
+                </span>
+                <s.icon size={18} className="text-[#374151]" />
               </div>
-            ))}
-          </div>
+              <h3 className="mb-2 text-lg font-bold">{s.title}</h3>
+              <p className="text-base leading-relaxed text-[#374151]">{s.desc}</p>
+            </motion.div>
+          ))}
         </div>
-      </section>
+      </AnimatedSection>
+    </div>
+  );
+}
 
-      {/* ── 12 FAQ ── */}
-      <section id="faq" className="py-16 bg-white">
-        <div className="max-w-3xl mx-auto px-4">
-          <SectionLabel cat="FAQ" num={12} />
-          <h2 className="text-2xl font-bold text-[#111827] text-center mb-12">よくある質問</h2>
-          <div className="space-y-3">
-            {[
-              { q: "無料プランに期限はありますか？", a: "いいえ、無料プランに期限はありません。ずっと無料でお使いいただけます。" },
-              { q: "クレジットカードは必要ですか？", a: "無料プランではクレジットカードは不要です。有料プランへのアップグレード時に登録いただきます。" },
-              { q: "どんなサイトにも埋め込めますか？", a: "はい、HTMLを編集できるサイトであれば、スクリプトタグを貼り付けるだけで表示できます。" },
-              { q: "デザインはカスタマイズできますか？", a: "はい、Proプラン以上でカラー・レイアウト・フォントなどを自由にカスタマイズできます。" },
-              { q: "データのエクスポートは可能ですか？", a: "はい、収集したお客様の声はCSV形式でいつでもダウンロードできます。" },
-              { q: "解約はいつでもできますか？", a: "はい、いつでも解約可能です。解約後も期間終了まではご利用いただけます。" },
-            ].map((item, i) => (
-              <div key={i} className="bg-gray-50 rounded-xl border border-gray-100">
-                <button
-                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  className="w-full flex items-center justify-between p-5 text-left"
-                >
-                  <span className="text-sm font-medium text-[#111827]">{item.q}</span>
-                  <svg
-                    className={`w-5 h-5 text-gray-400 flex-shrink-0 transition-transform ${
-                      openFaq === i ? "rotate-180" : ""
-                    }`}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                {openFaq === i && (
-                  <div className="px-5 pb-5">
-                    <p className="text-sm text-gray-500 leading-relaxed">{item.a}</p>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+/* ═══════════════════════════════════════════
+   10. Features
+   ═══════════════════════════════════════════ */
 
-      {/* ── 13 WAITLIST ── */}
-      <section id="waitlist" className="py-16">
-        <div className="max-w-xl mx-auto px-4 text-center">
-          <SectionLabel cat="事前登録" num={13} />
-          <h2 className="text-2xl font-bold text-[#111827] mb-4">事前登録する</h2>
-          <p className="text-gray-700 mb-8">リリース時に優先的にご案内します</p>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              alert("ご登録ありがとうございます！");
-              setEmail("");
-            }}
-            className="flex gap-3 max-w-md mx-auto"
-          >
-            <input
-              type="email"
-              required
-              placeholder="メールアドレス"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="flex-1 px-4 py-3 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent"
-            />
-            <button
-              type="submit"
-              className="text-white font-medium px-6 py-3 rounded-lg transition hover:opacity-90 text-sm"
-              style={{ backgroundColor: ACCENT }}
+function Features({ isActive }: { isActive: boolean }) {
+  return (
+    <div className="flex h-full items-center border-t border-gray-200 px-6">
+      <AnimatedSection isActive={isActive} variants={staggerContainer(0.1)} className="mx-auto max-w-[1100px] w-full">
+        <motion.div variants={fadeUp}>
+          <SectionLabel>機能</SectionLabel>
+          <h2 className="mb-6 md:mb-12 text-2xl font-bold md:text-4xl">主な機能</h2>
+        </motion.div>
+
+        <div className="grid gap-3 md:gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {features.map((f) => (
+            <motion.div
+              key={f.title}
+              className="rounded-lg border border-gray-200 bg-white p-3 md:p-5 transition-colors hover:border-gray-300"
+              variants={fadeUp}
             >
-              登録
-            </button>
-          </form>
+              <div className="mb-2 md:mb-3 flex items-center gap-3">
+                <f.icon size={18} className="text-[#374151]" />
+                <h3 className="text-sm md:text-base font-bold">{f.title}</h3>
+              </div>
+              <p className="text-xs md:text-sm leading-relaxed text-[#374151]">{f.desc}</p>
+            </motion.div>
+          ))}
         </div>
-      </section>
+      </AnimatedSection>
+    </div>
+  );
+}
 
-      {/* ── 14 FOOTER ── */}
-      <footer className="py-8 border-t border-gray-100 bg-white">
-        <div className="max-w-5xl mx-auto px-4">
-          <SectionLabel cat="フッター" num={14} />
-          <div className="text-center">
-            <p className="text-sm text-gray-400">&copy; 2026 KoeLog</p>
+/* ═══════════════════════════════════════════
+   11. Pricing — Free
+   ═══════════════════════════════════════════ */
+
+function PricingCard({
+  plan,
+  goTo,
+  accent,
+}: {
+  plan: typeof plans[number];
+  goTo: (i: number) => void;
+  accent?: boolean;
+}) {
+  return (
+    <div className={`relative mx-auto w-full max-w-[400px] rounded-xl border ${accent ? "border-[#E8634A]" : "border-gray-200"} bg-white p-8 md:p-10`}>
+      {plan.recommended && (
+        <span className="absolute -top-3.5 left-6 rounded-md bg-[#E8634A] px-4 py-1 text-xs font-medium text-white">
+          おすすめ
+        </span>
+      )}
+      <h3 className="mb-2 text-xl font-bold" style={{ fontFamily: "var(--font-inter)" }}>
+        {plan.name}
+      </h3>
+      <p className="mb-6">
+        <span className="text-4xl font-bold" style={{ fontFamily: "var(--font-inter)" }}>
+          {plan.price}
+        </span>
+        {plan.period && (
+          <span className="text-base font-medium" style={{ color: '#111827' }}>{plan.period}（税込）</span>
+        )}
+      </p>
+      <ul className="mb-8 space-y-3">
+        {plan.features.map((f) => (
+          <li key={f} className="flex items-start gap-2.5 text-base font-medium" style={{ color: '#111827' }}>
+            <Check size={16} className="mt-0.5 shrink-0 text-[#E8634A]" />
+            {f}
+          </li>
+        ))}
+      </ul>
+      <button
+        onClick={() => goTo(16)}
+        className={`block w-full rounded-md py-3 text-center text-base font-medium transition-opacity hover:opacity-90 cursor-pointer border-none ${
+          accent
+            ? "bg-[#E8634A] text-white"
+            : "border border-gray-200 bg-white text-[#1A1A1A] hover:border-gray-300"
+        }`}
+      >
+        始める
+      </button>
+    </div>
+  );
+}
+
+function PricingFree({ isActive, goTo }: { isActive: boolean; goTo: (i: number) => void }) {
+  return (
+    <div className="flex h-full items-center bg-[#F5F3EF] px-4 md:px-6">
+      <AnimatedSection isActive={isActive} variants={staggerContainer(0.15)} className="mx-auto max-w-[1100px] w-full">
+        <motion.div variants={fadeUp}>
+          <div className="flex items-center justify-between">
+            <SectionLabel>料金プラン</SectionLabel>
+            <span className="text-xs text-[#374151]">1/3</span>
           </div>
+          <h2 className="mb-2 md:mb-3 text-2xl font-bold md:text-4xl">Free</h2>
+          <p className="mb-6 md:mb-10 max-w-md text-xs md:text-base leading-relaxed text-[#374151]">
+            まずは無料で試す
+          </p>
+        </motion.div>
+        <motion.div variants={popIn}>
+          <PricingCard plan={plans[0]} goTo={goTo} />
+        </motion.div>
+      </AnimatedSection>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   12. Pricing — Pro
+   ═══════════════════════════════════════════ */
+
+function PricingPro({ isActive, goTo }: { isActive: boolean; goTo: (i: number) => void }) {
+  return (
+    <div className="flex h-full items-center px-4 md:px-6">
+      <AnimatedSection isActive={isActive} variants={staggerContainer(0.15)} className="mx-auto max-w-[1100px] w-full">
+        <motion.div variants={fadeUp}>
+          <div className="flex items-center justify-between">
+            <SectionLabel>料金プラン</SectionLabel>
+            <span className="text-xs text-[#374151]">2/3</span>
+          </div>
+          <h2 className="mb-2 md:mb-3 text-2xl font-bold md:text-4xl">Pro — おすすめ</h2>
+          <p className="mb-6 md:mb-10 max-w-md text-xs md:text-base leading-relaxed text-[#374151]">
+            本格運用に
+          </p>
+        </motion.div>
+        <motion.div variants={popIn}>
+          <PricingCard plan={plans[1]} goTo={goTo} accent />
+        </motion.div>
+      </AnimatedSection>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   13. Pricing — Agency
+   ═══════════════════════════════════════════ */
+
+function PricingAgency({ isActive, goTo }: { isActive: boolean; goTo: (i: number) => void }) {
+  return (
+    <div className="flex h-full items-center bg-[#F5F3EF] px-4 md:px-6">
+      <AnimatedSection isActive={isActive} variants={staggerContainer(0.15)} className="mx-auto max-w-[1100px] w-full">
+        <motion.div variants={fadeUp}>
+          <div className="flex items-center justify-between">
+            <SectionLabel>料金プラン</SectionLabel>
+            <span className="text-xs text-[#374151]">3/3</span>
+          </div>
+          <h2 className="mb-2 md:mb-3 text-2xl font-bold md:text-4xl">Agency</h2>
+          <p className="mb-6 md:mb-10 max-w-md text-xs md:text-base leading-relaxed text-[#374151]">
+            複数クライアントを管理
+          </p>
+        </motion.div>
+        <motion.div variants={popIn}>
+          <PricingCard plan={plans[2]} goTo={goTo} />
+        </motion.div>
+      </AnimatedSection>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   14. FAQ
+   ═══════════════════════════════════════════ */
+
+function FaqItem({
+  item,
+  isOpen,
+  toggle,
+}: {
+  item: { q: string; a: string };
+  isOpen: boolean;
+  toggle: () => void;
+}) {
+  return (
+    <div className="border-b border-gray-200">
+      <button
+        onClick={toggle}
+        className="flex w-full items-center justify-between py-3 md:py-5 text-left"
+      >
+        <span className="pr-4 text-sm md:text-base font-medium text-[#1A1A1A]">{item.q}</span>
+        {isOpen ? (
+          <Minus size={16} className="shrink-0 text-[#374151]" />
+        ) : (
+          <Plus size={16} className="shrink-0 text-[#374151]" />
+        )}
+      </button>
+      {isOpen && (
+        <p className="pb-5 text-sm leading-relaxed text-[#374151]">{item.a}</p>
+      )}
+    </div>
+  );
+}
+
+function FAQ({ isActive }: { isActive: boolean }) {
+  const [open, setOpen] = useState<number | null>(null);
+
+  return (
+    <div className="flex h-full items-center px-6">
+      <AnimatedSection isActive={isActive} variants={staggerContainer(0.08)} className="mx-auto max-w-[700px] w-full">
+        <motion.div variants={fadeUp}>
+          <SectionLabel>FAQ</SectionLabel>
+          <h2 className="mb-4 md:mb-10 text-2xl font-bold md:text-4xl">よくある質問</h2>
+        </motion.div>
+
+        {faqData.map((item, i) => (
+          <motion.div key={i} variants={fadeUp}>
+            <FaqItem
+              item={item}
+              isOpen={open === i}
+              toggle={() => setOpen(open === i ? null : i)}
+            />
+          </motion.div>
+        ))}
+      </AnimatedSection>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   15. CTA + Footer
+   ═══════════════════════════════════════════ */
+
+function WaitlistSection({ isActive }: { isActive: boolean }) {
+  const [email, setEmail] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log({ email });
+    setSubmitted(true);
+  };
+
+  return (
+    <div className="flex h-full flex-col">
+      <div className="flex flex-1 items-center justify-center bg-[#F5F3EF] px-6">
+        <AnimatedSection isActive={isActive} variants={bounceFade} className="mx-auto max-w-[480px] text-center">
+          <h2 className="mb-3 text-3xl font-bold md:text-4xl">
+            事前登録する
+          </h2>
+          <p className="mb-8 text-base text-[#374151]">
+            リリース時に優先的にご案内します
+          </p>
+
+          {submitted ? (
+            <div className="py-8">
+              <Check size={32} className="mx-auto mb-3 text-[#E8634A]" />
+              <p className="font-bold text-[#1A1A1A]">登録ありがとうございます</p>
+              <p className="mt-1 text-sm text-[#374151]">
+                招待メールをお待ちください。
+              </p>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="flex gap-2">
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="min-w-0 flex-1 rounded-md border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-[#E8634A]"
+              />
+              <button
+                type="submit"
+                className="shrink-0 rounded-md bg-[#E8634A] px-6 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90"
+              >
+                登録
+              </button>
+            </form>
+          )}
+        </AnimatedSection>
+      </div>
+      <footer className="border-t border-gray-200 bg-[#F5F3EF] px-6 py-8">
+        <div className="mx-auto flex max-w-[1100px] items-center justify-between">
+          <span className="text-sm font-bold text-[#1A1A1A]" style={{ fontFamily: "var(--font-inter)" }}>
+            KoeLog
+          </span>
+          <span className="text-xs text-[#374151]">&copy; 2026 KoeLog</span>
         </div>
       </footer>
     </div>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   Navigation Dots
+   ═══════════════════════════════════════════ */
+
+function NavDots({
+  total,
+  current,
+  goTo,
+}: {
+  total: number;
+  current: number;
+  goTo: (i: number) => void;
+}) {
+  return (
+    <nav className="nav-dots" aria-label="セクションナビゲーション">
+      {Array.from({ length: total }, (_, i) => (
+        <button
+          key={i}
+          className={`nav-dot ${i === current ? "active" : ""}`}
+          onClick={() => goTo(i)}
+          aria-label={SECTION_NAMES[i] || `セクション ${i + 1}`}
+        />
+      ))}
+    </nav>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   Page — FullPage Controller
+   ═══════════════════════════════════════════ */
+
+const TOTAL_SECTIONS = 17;
+const DEBOUNCE_MS = 900;
+
+export default function Home() {
+  const [currentSection, setCurrentSection] = useState(0);
+  const isTransitioning = useRef(false);
+  const touchStartY = useRef(0);
+
+  const goTo = useCallback((index: number) => {
+    if (index < 0 || index >= TOTAL_SECTIONS || index === currentSection) return;
+    if (isTransitioning.current) return;
+    isTransitioning.current = true;
+    setCurrentSection(index);
+    setTimeout(() => {
+      isTransitioning.current = false;
+    }, DEBOUNCE_MS);
+  }, [currentSection]);
+
+  const goNext = useCallback(() => goTo(currentSection + 1), [currentSection, goTo]);
+  const goPrev = useCallback(() => goTo(currentSection - 1), [currentSection, goTo]);
+
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      const target = e.target as HTMLElement;
+      const scrollable = target.closest(".fullpage-section[data-state='active']");
+      if (scrollable) {
+        const el = scrollable as HTMLElement;
+        const hasScroll = el.scrollHeight > el.clientHeight;
+        if (hasScroll) {
+          const atTop = el.scrollTop <= 0;
+          const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 2;
+          if (e.deltaY > 0 && !atBottom) return;
+          if (e.deltaY < 0 && !atTop) return;
+        }
+      }
+
+      e.preventDefault();
+      if (e.deltaY > 5) goNext();
+      else if (e.deltaY < -5) goPrev();
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowDown" || e.key === "PageDown") {
+        e.preventDefault();
+        goNext();
+      } else if (e.key === "ArrowUp" || e.key === "PageUp") {
+        e.preventDefault();
+        goPrev();
+      }
+    };
+
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartY.current = e.touches[0].clientY;
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      const deltaY = touchStartY.current - e.changedTouches[0].clientY;
+      if (Math.abs(deltaY) < 50) return;
+
+      const target = e.target as HTMLElement;
+      const scrollable = target.closest(".fullpage-section[data-state='active']");
+      if (scrollable) {
+        const el = scrollable as HTMLElement;
+        const hasScroll = el.scrollHeight > el.clientHeight;
+        if (hasScroll) {
+          const atTop = el.scrollTop <= 0;
+          const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 2;
+          if (deltaY > 0 && !atBottom) return;
+          if (deltaY < 0 && !atTop) return;
+        }
+      }
+
+      if (deltaY > 0) goNext();
+      else goPrev();
+    };
+
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
+    window.addEventListener("touchend", handleTouchEnd, { passive: true });
+
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [goNext, goPrev]);
+
+  return (
+    <>
+      <Header currentSection={currentSection} goTo={goTo} />
+      <NavDots total={TOTAL_SECTIONS} current={currentSection} goTo={goTo} />
+      <div className="fullpage-container">
+        <FullPageSection index={0} currentSection={currentSection}>
+          <Hero isActive={currentSection === 0} goTo={goTo} />
+        </FullPageSection>
+        <FullPageSection index={1} currentSection={currentSection}>
+          <PainPoints isActive={currentSection === 1} />
+        </FullPageSection>
+        <FullPageSection index={2} currentSection={currentSection}>
+          <WidgetDemoCard isActive={currentSection === 2} />
+        </FullPageSection>
+        <FullPageSection index={3} currentSection={currentSection}>
+          <WidgetDemoCarousel isActive={currentSection === 3} />
+        </FullPageSection>
+        <FullPageSection index={4} currentSection={currentSection}>
+          <WidgetDemoBadge isActive={currentSection === 4} />
+        </FullPageSection>
+        <FullPageSection index={5} currentSection={currentSection}>
+          <BeforeCollect isActive={currentSection === 5} />
+        </FullPageSection>
+        <FullPageSection index={6} currentSection={currentSection}>
+          <AfterCollect isActive={currentSection === 6} />
+        </FullPageSection>
+        <FullPageSection index={7} currentSection={currentSection}>
+          <DashboardPreview isActive={currentSection === 7} />
+        </FullPageSection>
+        <FullPageSection index={8} currentSection={currentSection}>
+          <BeforeDisplay isActive={currentSection === 8} />
+        </FullPageSection>
+        <FullPageSection index={9} currentSection={currentSection}>
+          <AfterDisplay isActive={currentSection === 9} />
+        </FullPageSection>
+        <FullPageSection index={10} currentSection={currentSection}>
+          <Steps isActive={currentSection === 10} />
+        </FullPageSection>
+        <FullPageSection index={11} currentSection={currentSection}>
+          <Features isActive={currentSection === 11} />
+        </FullPageSection>
+        <FullPageSection index={12} currentSection={currentSection}>
+          <PricingFree isActive={currentSection === 12} goTo={goTo} />
+        </FullPageSection>
+        <FullPageSection index={13} currentSection={currentSection}>
+          <PricingPro isActive={currentSection === 13} goTo={goTo} />
+        </FullPageSection>
+        <FullPageSection index={14} currentSection={currentSection}>
+          <PricingAgency isActive={currentSection === 14} goTo={goTo} />
+        </FullPageSection>
+        <FullPageSection index={15} currentSection={currentSection}>
+          <FAQ isActive={currentSection === 15} />
+        </FullPageSection>
+        <FullPageSection index={16} currentSection={currentSection}>
+          <WaitlistSection isActive={currentSection === 16} />
+        </FullPageSection>
+      </div>
+    </>
   );
 }
