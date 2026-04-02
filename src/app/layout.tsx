@@ -14,10 +14,29 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
+const siteName = "KoeLog";
+const title = "KoeLog（コエログ）- お客様の声管理ツール";
+const description =
+  "お客様の声の収集・承認・サイト表示をたった2分で。KoeLogで手作業から解放されましょう。";
+const url = "https://koe-lp.vercel.app";
+
 export const metadata: Metadata = {
-  title: "KoeLog（コエログ）- お客様の声管理ツール",
-  description:
-    "お客様の声の収集・承認・サイト表示をたった2分で。KoeLogで手作業から解放されましょう。",
+  title,
+  description,
+  metadataBase: new URL(url),
+  openGraph: {
+    title,
+    description,
+    siteName,
+    url,
+    locale: "ja_JP",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+  },
 };
 
 export default function RootLayout({
