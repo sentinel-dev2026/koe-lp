@@ -15,13 +15,12 @@ export default function Image() {
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "space-between",
+          justifyContent: "center",
           padding: "80px",
           fontFamily: "sans-serif",
-          position: "relative",
         }}
       >
-        {/* Top-left accent bar */}
+        {/* Top accent bar */}
         <div
           style={{
             position: "absolute",
@@ -30,112 +29,86 @@ export default function Image() {
             width: "100%",
             height: "6px",
             background: "#E8634A",
+            display: "flex",
           }}
         />
 
-        {/* Main content - left aligned */}
+        {/* Logo */}
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
-            gap: "28px",
-            marginTop: "20px",
+            alignItems: "center",
+            gap: "16px",
+            marginBottom: "32px",
           }}
         >
-          {/* Logo */}
+          <div
+            style={{
+              width: "64px",
+              height: "64px",
+              background: "#E8634A",
+              borderRadius: "16px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "white",
+              fontSize: "32px",
+              fontWeight: 700,
+            }}
+          >
+            K
+          </div>
           <div
             style={{
               display: "flex",
-              alignItems: "center",
-              gap: "16px",
+              fontSize: "64px",
+              fontWeight: 800,
+              letterSpacing: "-2px",
             }}
           >
-            {/* Logo icon - speech bubble */}
-            <div
-              style={{
-                width: "64px",
-                height: "64px",
-                background: "#E8634A",
-                borderRadius: "16px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "white",
-                fontSize: "32px",
-                fontWeight: 700,
-              }}
-            >
-              K
-            </div>
-            <div
-              style={{
-                fontSize: "64px",
-                fontWeight: 800,
-                color: "#1A1A1A",
-                letterSpacing: "-2px",
-              }}
-            >
-              Koe
-              <span style={{ color: "#E8634A" }}>Log</span>
-            </div>
-          </div>
-
-          {/* Catchcopy */}
-          <div
-            style={{
-              fontSize: "40px",
-              fontWeight: 600,
-              color: "#374151",
-              lineHeight: 1.4,
-            }}
-          >
-            お客様の声を、もっと簡単に。
-          </div>
-
-          {/* Sub description */}
-          <div
-            style={{
-              fontSize: "24px",
-              color: "#9CA3AF",
-              lineHeight: 1.6,
-            }}
-          >
-            収集・管理・サイト掲載をワンストップで
+            <div style={{ color: "#1A1A1A", display: "flex" }}>Koe</div>
+            <div style={{ color: "#E8634A", display: "flex" }}>Log</div>
           </div>
         </div>
 
-        {/* Bottom right - URL */}
+        {/* Catchcopy */}
         <div
           style={{
+            fontSize: "40px",
+            fontWeight: 600,
+            color: "#374151",
+            marginBottom: "16px",
             display: "flex",
-            justifyContent: "flex-end",
-            alignItems: "center",
           }}
         >
-          <div
-            style={{
-              fontSize: "22px",
-              color: "#9CA3AF",
-              fontWeight: 500,
-              letterSpacing: "1px",
-            }}
-          >
-            koelog.jp
-          </div>
+          お客様の声を、もっと簡単に。
         </div>
 
-        {/* Bottom-left accent dot */}
+        {/* Sub */}
+        <div
+          style={{
+            fontSize: "24px",
+            color: "#9CA3AF",
+            display: "flex",
+          }}
+        >
+          収集・管理・サイト掲載をワンストップで
+        </div>
+
+        {/* URL bottom right */}
         <div
           style={{
             position: "absolute",
-            bottom: "80px",
-            left: "80px",
-            width: "12px",
-            height: "12px",
-            borderRadius: "50%",
-            background: "#E8634A",
+            bottom: "40px",
+            right: "80px",
+            fontSize: "22px",
+            color: "#9CA3AF",
+            fontWeight: 500,
+            display: "flex",
           }}
-        />
+        >
+          koe-lp.vercel.app
+        </div>
       </div>
     ),
     { ...size }
