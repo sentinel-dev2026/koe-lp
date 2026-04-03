@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { Noto_Sans_JP, Inter } from "next/font/google";
 import "./globals.css";
 
@@ -14,16 +15,20 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-const siteName = "KoeLog";
+const siteName = "KoeLog（コエログ）";
 const title = "KoeLog（コエログ）- お客様の声管理ツール";
 const description =
   "お客様の声の収集・承認・サイト表示をたった2分で。KoeLogで手作業から解放されましょう。";
-const url = "https://koe-lp.vercel.app";
+const url = "https://koelog.jp";
 
 export const metadata: Metadata = {
   title,
   description,
   metadataBase: new URL(url),
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
   openGraph: {
     title,
     description,
@@ -49,6 +54,9 @@ export default function RootLayout({
       <body className="overflow-hidden bg-[#FAFAFA] text-[#1A1A1A]" style={{ fontFamily: "var(--font-noto), sans-serif" }}>
         {children}
       </body>
+      {process.env.NEXT_PUBLIC_GA_ID && (
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+      )}
     </html>
   );
 }
