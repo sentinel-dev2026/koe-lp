@@ -51,6 +51,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja" className={`${notoSansJP.variable} ${inter.variable} antialiased`}>
+      <head>
+        <meta name="color-scheme" content="light" />
+      </head>
       <body className="overflow-hidden bg-[#FAFAFA] text-[#1A1A1A]" style={{ fontFamily: "var(--font-noto), sans-serif" }}>
         {children}
       </body>

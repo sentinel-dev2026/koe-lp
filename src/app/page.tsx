@@ -275,11 +275,13 @@ function AnimatedSection({
   className?: string;
   children: React.ReactNode;
 }) {
+  const hasBeenActive = useRef(false);
+  if (isActive) hasBeenActive.current = true;
   return (
     <motion.div
       className={className}
       initial="hidden"
-      animate={isActive ? "visible" : "hidden"}
+      animate={hasBeenActive.current ? "visible" : "hidden"}
       variants={variants}
     >
       {children}
@@ -1112,11 +1114,12 @@ function PricingCard({
       </ul>
       <button
         onClick={() => goTo(16)}
-        className={`block w-full rounded-md py-3 text-center text-base font-medium transition-opacity hover:opacity-90 cursor-pointer border-none ${
+        className={`block w-full rounded-md py-3 text-center text-base font-medium transition-opacity hover:opacity-90 cursor-pointer ${
           accent
-            ? "bg-[#E8634A] text-white"
-            : "border border-gray-200 bg-white text-[#1A1A1A] hover:border-gray-300"
+            ? "bg-[#E8634A] text-white border-none"
+            : "bg-white text-[#1A1A1A]"
         }`}
+        style={!accent ? { border: '1px solid #e5e7eb' } : undefined}
       >
         始める
       </button>
