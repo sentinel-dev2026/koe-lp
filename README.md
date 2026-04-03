@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# KoeLog（コエログ）LP
 
-## Getting Started
+![Status](https://img.shields.io/badge/ステータス-開発中（MVP）-orange)
 
-First, run the development server:
+お客様の声を「集めて・選んで・魅せる」SaaS — **KoeLog** のランディングページです。
+
+🔗 **LP**: [https://koe-lp.vercel.app](https://koe-lp.vercel.app)
+
+## KoeLog とは
+
+Web制作者（ココナラ・ランサーズ等のフリーランス）向けに、クライアントからの声を簡単に収集・管理・サイト掲載できるサービスです。
+
+### 主要機能
+
+- **収集フォーム** — URLを共有するだけでお客様の声を収集
+- **管理画面** — 承認/非承認でサイトに掲載する声を選別
+- **ウィジェット表示** — カード・カルーセル・バッジの3形式で任意のサイトに埋め込み
+- **SNSシェア** — お客様の声をOGP付きでSNSにシェア
+
+## 技術スタック
+
+| カテゴリ | 技術 |
+|---|---|
+| フレームワーク | Next.js 16 (App Router) |
+| スタイリング | Tailwind CSS v4 |
+| バックエンド/DB | Supabase |
+| ホスティング | Vercel |
+| アニメーション | Framer Motion |
+
+## 開発
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+http://localhost:3000 で確認できます。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 事前登録
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+KoeLogに興味がある方は、ぜひ事前登録をお願いします。
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+👉 [事前登録はこちら](https://koe-lp.vercel.app)
