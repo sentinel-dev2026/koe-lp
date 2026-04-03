@@ -1314,29 +1314,34 @@ function WaitlistSection({ isActive }: { isActive: boolean }) {
               </p>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-              <div className="flex gap-2">
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  disabled={loading}
-                  className="min-w-0 flex-1 rounded-md border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-[#E8634A] disabled:opacity-50"
-                />
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="shrink-0 rounded-md bg-[#E8634A] px-6 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-                >
-                  {loading ? "登録中..." : "登録"}
-                </button>
-              </div>
-              {errorMsg && (
-                <p className="text-sm text-red-500">{errorMsg}</p>
-              )}
-            </form>
+            <>
+              <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    disabled={loading}
+                    className="min-w-0 flex-1 rounded-md border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-[#E8634A] disabled:opacity-50"
+                  />
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="shrink-0 rounded-md bg-[#E8634A] px-6 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                  >
+                    {loading ? "登録中..." : "登録"}
+                  </button>
+                </div>
+                {errorMsg && (
+                  <p className="text-sm text-red-500">{errorMsg}</p>
+                )}
+              </form>
+              <p className="mt-3 text-xs text-[#9CA3AF]">
+                ご入力いただいたメールアドレスはリリースのご案内にのみ使用いたします。
+              </p>
+            </>
           )}
         </AnimatedSection>
       </div>
