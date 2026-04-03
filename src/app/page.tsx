@@ -273,15 +273,15 @@ function AnimatedSection({
   className?: string;
   children: React.ReactNode;
 }) {
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    if (isActive && !visible) setVisible(true);
-  }, [isActive, visible]);
+  /* framer-motion の opacity 制御を完全に排除。
+     セクションの表示/非表示は CSS fullpage-section が担当。
+     initial={false} で SSR 時の opacity:0 インラインスタイルを防止。
+     常に "visible" を指定し、子 motion.div も即座に表示される。 */
   return (
     <motion.div
       className={className}
-      initial="hidden"
-      animate={visible ? "visible" : "hidden"}
+      initial={false}
+      animate="visible"
       variants={variants}
     >
       {children}
