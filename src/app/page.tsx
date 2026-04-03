@@ -2,10 +2,6 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import {
-  motion,
-  type Variants,
-} from "framer-motion";
-import {
   FileText,
   CheckCircle,
   Code,
@@ -23,51 +19,6 @@ import {
   Shield,
   Download,
 } from "lucide-react";
-
-/* ═══════════════════════════════════════════
-   Animation helpers
-   ═══════════════════════════════════════════ */
-
-const fadeUp: Variants = {
-  hidden: { y: 30 },
-  visible: { y: 0, transition: { duration: 0.6, ease: "easeOut" } },
-};
-
-const fadeLeft: Variants = {
-  hidden: { x: -30 },
-  visible: { x: 0, transition: { duration: 0.6, ease: "easeOut" } },
-};
-
-const fadeRight: Variants = {
-  hidden: { x: 30 },
-  visible: { x: 0, transition: { duration: 0.6, ease: "easeOut" } },
-};
-
-const staggerContainer = (stagger = 0.15): Variants => ({
-  hidden: {},
-  visible: { transition: { staggerChildren: stagger } },
-});
-
-const scaleUp: Variants = {
-  hidden: { scale: 0.95 },
-  visible: { scale: 1, transition: { duration: 0.6, ease: "easeOut" } },
-};
-
-const popIn: Variants = {
-  hidden: { scale: 0.9 },
-  visible: {
-    scale: 1,
-    transition: { duration: 0.5, ease: [0.175, 0.885, 0.32, 1.275] },
-  },
-};
-
-const bounceFade: Variants = {
-  hidden: { y: 20 },
-  visible: {
-    y: 0,
-    transition: { duration: 0.6, ease: [0.175, 0.885, 0.32, 1.1] },
-  },
-};
 
 /* ═══════════════════════════════════════════
    Data
@@ -264,28 +215,17 @@ function FullPageSection({
 
 function AnimatedSection({
   isActive,
-  variants,
   className,
   children,
 }: {
   isActive: boolean;
-  variants?: Variants;
   className?: string;
   children: React.ReactNode;
 }) {
-  /* framer-motion の opacity 制御を完全に排除。
-     セクションの表示/非表示は CSS fullpage-section が担当。
-     initial={false} で SSR 時の opacity:0 インラインスタイルを防止。
-     常に "visible" を指定し、子 motion.div も即座に表示される。 */
   return (
-    <motion.div
-      className={className}
-      initial={false}
-      animate="visible"
-      variants={variants}
-    >
+    <div className={className}>
       {children}
-    </motion.div>
+    </div>
   );
 }
 
@@ -403,8 +343,8 @@ function DashboardMock() {
 function Hero({ isActive, goTo }: { isActive: boolean; goTo: (i: number) => void }) {
   return (
     <div className="flex h-full items-center px-6">
-      <AnimatedSection isActive={isActive} variants={staggerContainer(0.15)} className="mx-auto grid max-w-[1100px] items-center gap-12 md:grid-cols-[1fr_420px] w-full">
-        <motion.div variants={fadeLeft}>
+      <AnimatedSection isActive={isActive} className="mx-auto grid max-w-[1100px] items-center gap-12 md:grid-cols-[1fr_420px] w-full">
+        <div>
           <SectionLabel>お客様の声管理ツール</SectionLabel>
           <h1 className="mb-5 text-4xl font-bold leading-tight md:text-5xl lg:text-6xl">
             お客様の声を、
@@ -431,10 +371,10 @@ function Hero({ isActive, goTo }: { isActive: boolean; goTo: (i: number) => void
               デモを見る
             </button>
           </div>
-        </motion.div>
-        <motion.div className="hidden md:block" variants={fadeRight}>
+        </div>
+        <div className="hidden md:block">
           <DashboardMock />
-        </motion.div>
+        </div>
       </AnimatedSection>
     </div>
   );
@@ -474,10 +414,10 @@ function PainPoints({ isActive }: { isActive: boolean }) {
 
   return (
     <div className="flex h-full items-center border-t border-gray-200 bg-[#F5F3EF] px-6">
-      <AnimatedSection isActive={isActive} variants={staggerContainer(0.1)} className="mx-auto max-w-[1100px] w-full">
+      <AnimatedSection isActive={isActive} className="mx-auto max-w-[1100px] w-full">
         <div className="grid gap-12 md:grid-cols-3">
           {points.map((p) => (
-            <motion.div key={p.suffix + p.num} variants={fadeUp}>
+            <div key={p.suffix + p.num}>
               <p
                 className="mb-2 text-4xl font-bold text-[#E8634A]"
                 style={{ fontFamily: "var(--font-inter)" }}
@@ -485,7 +425,7 @@ function PainPoints({ isActive }: { isActive: boolean }) {
                 <CountUp target={p.num} suffix={p.suffix} isActive={isActive} />
               </p>
               <p className="text-lg font-semibold leading-relaxed" style={{ color: '#111827' }}>{p.text}</p>
-            </motion.div>
+            </div>
           ))}
         </div>
       </AnimatedSection>
@@ -516,8 +456,8 @@ function WidgetBrowserFrame({ children }: { children: React.ReactNode }) {
 function WidgetDemoCard({ isActive }: { isActive: boolean }) {
   return (
     <div className="flex h-full items-center px-4 md:px-6">
-      <AnimatedSection isActive={isActive} variants={staggerContainer(0.15)} className="mx-auto max-w-[1100px] w-full">
-        <motion.div variants={fadeUp}>
+      <AnimatedSection isActive={isActive} className="mx-auto max-w-[1100px] w-full">
+        <div>
           <div className="flex items-center justify-between">
             <SectionLabel>サイトでの表示イメージ</SectionLabel>
             <span className="text-xs text-[#374151]">1/3</span>
@@ -526,9 +466,9 @@ function WidgetDemoCard({ isActive }: { isActive: boolean }) {
           <p className="mb-4 md:mb-8 max-w-md text-xs md:text-base leading-relaxed text-[#374151]">
             複数の声をグリッドで一覧表示
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div variants={scaleUp}>
+        <div>
           <WidgetBrowserFrame>
             <div className="grid gap-3 sm:grid-cols-2">
               {testimonials.map((t) => (
@@ -545,7 +485,7 @@ function WidgetDemoCard({ isActive }: { isActive: boolean }) {
               ))}
             </div>
           </WidgetBrowserFrame>
-        </motion.div>
+        </div>
       </AnimatedSection>
     </div>
   );
@@ -571,8 +511,8 @@ function WidgetDemoCarousel({ isActive }: { isActive: boolean }) {
 
   return (
     <div className="flex h-full items-center bg-[#F5F3EF] px-4 md:px-6">
-      <AnimatedSection isActive={isActive} variants={staggerContainer(0.15)} className="mx-auto max-w-[1100px] w-full">
-        <motion.div variants={fadeUp}>
+      <AnimatedSection isActive={isActive} className="mx-auto max-w-[1100px] w-full">
+        <div>
           <div className="flex items-center justify-between">
             <SectionLabel>サイトでの表示イメージ</SectionLabel>
             <span className="text-xs text-[#374151]">2/3</span>
@@ -581,9 +521,9 @@ function WidgetDemoCarousel({ isActive }: { isActive: boolean }) {
           <p className="mb-4 md:mb-8 max-w-md text-xs md:text-base leading-relaxed text-[#374151]">
             1件ずつスライドして表示
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div variants={scaleUp}>
+        <div>
           <WidgetBrowserFrame>
             <div className="relative mx-auto max-w-sm">
               <div className="rounded-md border border-gray-200 bg-white p-6 text-center">
@@ -627,7 +567,7 @@ function WidgetDemoCarousel({ isActive }: { isActive: boolean }) {
               </div>
             </div>
           </WidgetBrowserFrame>
-        </motion.div>
+        </div>
       </AnimatedSection>
     </div>
   );
@@ -644,8 +584,8 @@ function WidgetDemoBadge({ isActive }: { isActive: boolean }) {
 
   return (
     <div className="flex h-full items-center px-4 md:px-6">
-      <AnimatedSection isActive={isActive} variants={staggerContainer(0.15)} className="mx-auto max-w-[1100px] w-full">
-        <motion.div variants={fadeUp}>
+      <AnimatedSection isActive={isActive} className="mx-auto max-w-[1100px] w-full">
+        <div>
           <div className="flex items-center justify-between">
             <SectionLabel>サイトでの表示イメージ</SectionLabel>
             <span className="text-xs text-[#374151]">3/3</span>
@@ -654,9 +594,9 @@ function WidgetDemoBadge({ isActive }: { isActive: boolean }) {
           <p className="mb-4 md:mb-8 max-w-md text-xs md:text-base leading-relaxed text-[#374151]">
             コンパクトに評価スコアを表示
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div variants={scaleUp}>
+        <div>
           <WidgetBrowserFrame>
             <div className="flex justify-center py-8">
               <div className="inline-flex items-center gap-3 rounded-lg border border-gray-200 bg-white px-8 py-5 shadow-sm">
@@ -680,7 +620,7 @@ function WidgetDemoBadge({ isActive }: { isActive: boolean }) {
               </div>
             </div>
           </WidgetBrowserFrame>
-        </motion.div>
+        </div>
       </AnimatedSection>
     </div>
   );
@@ -703,8 +643,8 @@ const collectStepsBefore = [
 function BeforeCollect({ isActive }: { isActive: boolean }) {
   return (
     <div className="flex h-full items-center border-t border-gray-200 bg-[#FAFAF8] px-4 md:px-6">
-      <AnimatedSection isActive={isActive} variants={staggerContainer(0.1)} className="mx-auto max-w-[700px] w-full">
-        <motion.div variants={fadeUp}>
+      <AnimatedSection isActive={isActive} className="mx-auto max-w-[700px] w-full">
+        <div>
           <div className="flex items-center justify-between">
             <SectionLabel>集め方の比較</SectionLabel>
             <span className="text-xs text-[#374151]">1/4</span>
@@ -713,9 +653,9 @@ function BeforeCollect({ isActive }: { isActive: boolean }) {
           <p className="mb-3 md:mb-4 max-w-md text-xs md:text-sm leading-relaxed text-[#374151]">
             こんな手間、かけていませんか？
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div variants={fadeUp}>
+        <div>
           <div className="rounded-lg border border-gray-200 bg-[#F3F3F0] p-3 md:p-6">
             <div className="grid grid-cols-2 gap-2 md:gap-3">
               {collectStepsBefore.map((step, i) => (
@@ -734,7 +674,7 @@ function BeforeCollect({ isActive }: { isActive: boolean }) {
               7ステップ、毎回この手間は大変…
             </p>
           </div>
-        </motion.div>
+        </div>
       </AnimatedSection>
     </div>
   );
@@ -753,8 +693,8 @@ const collectStepsAfter = [
 function AfterCollect({ isActive }: { isActive: boolean }) {
   return (
     <div className="flex h-full items-center px-4 md:px-6">
-      <AnimatedSection isActive={isActive} variants={staggerContainer(0.1)} className="mx-auto max-w-[700px] w-full">
-        <motion.div variants={fadeUp}>
+      <AnimatedSection isActive={isActive} className="mx-auto max-w-[700px] w-full">
+        <div>
           <div className="flex items-center justify-between">
             <SectionLabel>集め方の比較</SectionLabel>
             <span className="text-xs text-[#374151]">2/4</span>
@@ -763,9 +703,9 @@ function AfterCollect({ isActive }: { isActive: boolean }) {
           <p className="mb-4 md:mb-8 max-w-md text-xs md:text-base leading-relaxed text-[#374151]">
             たった3ステップで完了
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div variants={fadeUp}>
+        <div>
           <div className="rounded-lg border border-gray-200 bg-white p-4 md:p-8">
             <div className="space-y-0">
               {collectStepsAfter.map((step, i) => (
@@ -788,7 +728,7 @@ function AfterCollect({ isActive }: { isActive: boolean }) {
               7ステップ → 3ステップに短縮
             </p>
           </div>
-        </motion.div>
+        </div>
       </AnimatedSection>
     </div>
   );
@@ -807,16 +747,16 @@ function DashboardPreview({ isActive }: { isActive: boolean }) {
 
   return (
     <div className="flex h-full items-center bg-[#FAFAF8] px-4 md:px-6">
-      <AnimatedSection isActive={isActive} variants={staggerContainer(0.15)} className="mx-auto max-w-[700px] w-full">
-        <motion.div variants={fadeUp}>
+      <AnimatedSection isActive={isActive} className="mx-auto max-w-[700px] w-full">
+        <div>
           <SectionLabel>管理画面</SectionLabel>
           <h2 className="mb-1 md:mb-2 text-xl font-bold md:text-3xl">直感的なダッシュボード</h2>
           <p className="mb-3 md:mb-6 max-w-md text-xs md:text-sm leading-relaxed text-[#374151]">
             声の収集・承認・分析をひとつの画面で
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div variants={scaleUp}>
+        <div>
           {/* Browser Frame */}
           <div className="rounded-lg border border-gray-200 bg-white">
             <div className="flex items-center gap-1.5 border-b border-gray-100 px-3 md:px-4 py-2">
@@ -886,7 +826,7 @@ function DashboardPreview({ isActive }: { isActive: boolean }) {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       </AnimatedSection>
     </div>
   );
@@ -899,8 +839,8 @@ function DashboardPreview({ isActive }: { isActive: boolean }) {
 function BeforeDisplay({ isActive }: { isActive: boolean }) {
   return (
     <div className="flex h-full items-center border-t border-gray-200 bg-[#FAFAF8] px-4 md:px-6">
-      <AnimatedSection isActive={isActive} variants={staggerContainer(0.15)} className="mx-auto max-w-[700px] w-full">
-        <motion.div variants={fadeUp}>
+      <AnimatedSection isActive={isActive} className="mx-auto max-w-[700px] w-full">
+        <div>
           <div className="flex items-center justify-between">
             <SectionLabel>サイト表示の比較</SectionLabel>
             <span className="text-xs text-[#374151]">3/4</span>
@@ -909,9 +849,9 @@ function BeforeDisplay({ isActive }: { isActive: boolean }) {
           <p className="mb-4 md:mb-8 max-w-md text-xs md:text-base leading-relaxed text-[#374151]">
             テキストだけの味気ない表示になっていませんか？
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div variants={fadeUp}>
+        <div>
           <div className="rounded-lg border border-gray-200 bg-gray-100 p-4 md:p-8">
             <div className="mb-3 md:mb-4 rounded border border-gray-300 bg-white px-3 md:px-4 py-2 md:py-3 text-left text-xs md:text-sm text-[#374151]">
               Googleフォーム - お客様の声
@@ -930,7 +870,7 @@ function BeforeDisplay({ isActive }: { isActive: boolean }) {
               テキストだけで、信頼感が伝わらない…
             </p>
           </div>
-        </motion.div>
+        </div>
       </AnimatedSection>
     </div>
   );
@@ -943,8 +883,8 @@ function BeforeDisplay({ isActive }: { isActive: boolean }) {
 function AfterDisplay({ isActive }: { isActive: boolean }) {
   return (
     <div className="flex h-full items-center px-4 md:px-6">
-      <AnimatedSection isActive={isActive} variants={staggerContainer(0.15)} className="mx-auto max-w-[700px] w-full">
-        <motion.div variants={fadeUp}>
+      <AnimatedSection isActive={isActive} className="mx-auto max-w-[700px] w-full">
+        <div>
           <div className="flex items-center justify-between">
             <SectionLabel>サイト表示の比較</SectionLabel>
             <span className="text-xs text-[#374151]">4/4</span>
@@ -955,9 +895,9 @@ function AfterDisplay({ isActive }: { isActive: boolean }) {
           <p className="mb-4 md:mb-8 max-w-md text-xs md:text-base leading-relaxed text-[#374151]">
             写真付き・星評価・デザイン統一
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div variants={fadeUp}>
+        <div>
           <div className="rounded-lg border border-gray-200 bg-white p-4 md:p-8">
             <div className="space-y-3 md:space-y-4">
               {testimonials.slice(0, 3).map((t) => (
@@ -976,7 +916,7 @@ function AfterDisplay({ isActive }: { isActive: boolean }) {
               ))}
             </div>
           </div>
-        </motion.div>
+        </div>
       </AnimatedSection>
     </div>
   );
@@ -1010,17 +950,17 @@ function Steps({ isActive }: { isActive: boolean }) {
 
   return (
     <div className="flex h-full items-center px-6">
-      <AnimatedSection isActive={isActive} variants={staggerContainer(0.15)} className="mx-auto max-w-[1100px] w-full">
-        <motion.div variants={fadeUp}>
+      <AnimatedSection isActive={isActive} className="mx-auto max-w-[1100px] w-full">
+        <div>
           <SectionLabel>導入フロー</SectionLabel>
           <h2 className="mb-6 md:mb-12 text-2xl font-bold md:text-4xl">
             3ステップで完了
           </h2>
-        </motion.div>
+        </div>
 
         <div className="grid gap-12 md:grid-cols-3">
           {steps.map((s) => (
-            <motion.div key={s.num} variants={fadeUp}>
+            <div key={s.num}>
               <div className="mb-4 flex items-center gap-3">
                 <span
                   className="flex h-9 w-9 items-center justify-center rounded-md bg-[#F5F3EF] text-sm font-bold text-[#E8634A]"
@@ -1032,7 +972,7 @@ function Steps({ isActive }: { isActive: boolean }) {
               </div>
               <h3 className="mb-2 text-lg font-bold">{s.title}</h3>
               <p className="text-base leading-relaxed text-[#374151]">{s.desc}</p>
-            </motion.div>
+            </div>
           ))}
         </div>
       </AnimatedSection>
@@ -1047,25 +987,25 @@ function Steps({ isActive }: { isActive: boolean }) {
 function Features({ isActive }: { isActive: boolean }) {
   return (
     <div className="flex h-full items-center border-t border-gray-200 px-6">
-      <AnimatedSection isActive={isActive} variants={staggerContainer(0.1)} className="mx-auto max-w-[1100px] w-full">
-        <motion.div variants={fadeUp}>
+      <AnimatedSection isActive={isActive} className="mx-auto max-w-[1100px] w-full">
+        <div>
           <SectionLabel>機能</SectionLabel>
           <h2 className="mb-6 md:mb-12 text-2xl font-bold md:text-4xl">主な機能</h2>
-        </motion.div>
+        </div>
 
         <div className="grid gap-3 md:gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((f) => (
-            <motion.div
+            <div
               key={f.title}
               className="rounded-lg border border-gray-200 bg-white p-3 md:p-5 transition-colors hover:border-gray-300"
-              variants={fadeUp}
+             
             >
               <div className="mb-2 md:mb-3 flex items-center gap-3">
                 <f.icon size={18} className="text-[#374151]" />
                 <h3 className="text-sm md:text-base font-bold">{f.title}</h3>
               </div>
               <p className="text-xs md:text-sm leading-relaxed text-[#374151]">{f.desc}</p>
-            </motion.div>
+            </div>
           ))}
         </div>
       </AnimatedSection>
@@ -1130,8 +1070,8 @@ function PricingCard({
 function PricingFree({ isActive, goTo }: { isActive: boolean; goTo: (i: number) => void }) {
   return (
     <div className="flex h-full items-center bg-[#F5F3EF] px-4 md:px-6">
-      <AnimatedSection isActive={isActive} variants={staggerContainer(0.15)} className="mx-auto max-w-[1100px] w-full">
-        <motion.div variants={fadeUp}>
+      <AnimatedSection isActive={isActive} className="mx-auto max-w-[1100px] w-full">
+        <div>
           <div className="flex items-center justify-between">
             <SectionLabel>料金プラン</SectionLabel>
             <span className="text-xs text-[#374151]">1/3</span>
@@ -1140,10 +1080,10 @@ function PricingFree({ isActive, goTo }: { isActive: boolean; goTo: (i: number) 
           <p className="mb-6 md:mb-10 max-w-md text-xs md:text-base leading-relaxed text-[#374151]">
             まずは無料で試す
           </p>
-        </motion.div>
-        <motion.div variants={popIn}>
+        </div>
+        <div>
           <PricingCard plan={plans[0]} goTo={goTo} />
-        </motion.div>
+        </div>
       </AnimatedSection>
     </div>
   );
@@ -1156,8 +1096,8 @@ function PricingFree({ isActive, goTo }: { isActive: boolean; goTo: (i: number) 
 function PricingPro({ isActive, goTo }: { isActive: boolean; goTo: (i: number) => void }) {
   return (
     <div className="flex h-full items-center px-4 md:px-6">
-      <AnimatedSection isActive={isActive} variants={staggerContainer(0.15)} className="mx-auto max-w-[1100px] w-full">
-        <motion.div variants={fadeUp}>
+      <AnimatedSection isActive={isActive} className="mx-auto max-w-[1100px] w-full">
+        <div>
           <div className="flex items-center justify-between">
             <SectionLabel>料金プラン</SectionLabel>
             <span className="text-xs text-[#374151]">2/3</span>
@@ -1166,10 +1106,10 @@ function PricingPro({ isActive, goTo }: { isActive: boolean; goTo: (i: number) =
           <p className="mb-6 md:mb-10 max-w-md text-xs md:text-base leading-relaxed text-[#374151]">
             本格運用に
           </p>
-        </motion.div>
-        <motion.div variants={popIn}>
+        </div>
+        <div>
           <PricingCard plan={plans[1]} goTo={goTo} accent />
-        </motion.div>
+        </div>
       </AnimatedSection>
     </div>
   );
@@ -1182,8 +1122,8 @@ function PricingPro({ isActive, goTo }: { isActive: boolean; goTo: (i: number) =
 function PricingAgency({ isActive, goTo }: { isActive: boolean; goTo: (i: number) => void }) {
   return (
     <div className="flex h-full items-center bg-[#F5F3EF] px-4 md:px-6">
-      <AnimatedSection isActive={isActive} variants={staggerContainer(0.15)} className="mx-auto max-w-[1100px] w-full">
-        <motion.div variants={fadeUp}>
+      <AnimatedSection isActive={isActive} className="mx-auto max-w-[1100px] w-full">
+        <div>
           <div className="flex items-center justify-between">
             <SectionLabel>料金プラン</SectionLabel>
             <span className="text-xs text-[#374151]">3/3</span>
@@ -1192,10 +1132,10 @@ function PricingAgency({ isActive, goTo }: { isActive: boolean; goTo: (i: number
           <p className="mb-6 md:mb-10 max-w-md text-xs md:text-base leading-relaxed text-[#374151]">
             複数クライアントを管理
           </p>
-        </motion.div>
-        <motion.div variants={popIn}>
+        </div>
+        <div>
           <PricingCard plan={plans[2]} goTo={goTo} />
-        </motion.div>
+        </div>
       </AnimatedSection>
     </div>
   );
@@ -1239,20 +1179,20 @@ function FAQ({ isActive }: { isActive: boolean }) {
 
   return (
     <div className="flex h-full items-center px-6">
-      <AnimatedSection isActive={isActive} variants={staggerContainer(0.08)} className="mx-auto max-w-[700px] w-full">
-        <motion.div variants={fadeUp}>
+      <AnimatedSection isActive={isActive} className="mx-auto max-w-[700px] w-full">
+        <div>
           <SectionLabel>FAQ</SectionLabel>
           <h2 className="mb-4 md:mb-10 text-2xl font-bold md:text-4xl">よくある質問</h2>
-        </motion.div>
+        </div>
 
         {faqData.map((item, i) => (
-          <motion.div key={i} variants={fadeUp}>
+          <div key={i}>
             <FaqItem
               item={item}
               isOpen={open === i}
               toggle={() => setOpen(open === i ? null : i)}
             />
-          </motion.div>
+          </div>
         ))}
       </AnimatedSection>
     </div>
@@ -1300,7 +1240,7 @@ function WaitlistSection({ isActive }: { isActive: boolean }) {
   return (
     <div className="flex h-full flex-col">
       <div className="flex flex-1 items-center justify-center bg-[#F5F3EF] px-6">
-        <AnimatedSection isActive={isActive} variants={bounceFade} className="mx-auto max-w-[480px] text-center">
+        <AnimatedSection isActive={isActive} className="mx-auto max-w-[480px] text-center">
           <h2 className="mb-3 text-3xl font-bold md:text-4xl">
             事前登録する
           </h2>
