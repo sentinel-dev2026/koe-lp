@@ -1025,7 +1025,7 @@ function PricingCard({
   accent?: boolean;
 }) {
   return (
-    <div className={`relative mx-auto w-full max-w-[400px] rounded-xl border ${accent ? "border-[#E8634A]" : "border-gray-200"} bg-white p-8 md:p-10`}>
+    <div className={`relative mx-auto flex h-full w-full max-w-[400px] flex-col rounded-xl border ${accent ? "border-[#E8634A]" : "border-gray-200"} bg-white p-8 md:p-10`}>
       {plan.recommended && (
         <span className="absolute -top-3.5 left-6 rounded-md bg-[#E8634A] px-4 py-1 text-xs font-medium text-white">
           おすすめ
@@ -1042,7 +1042,7 @@ function PricingCard({
           <span className="text-base font-medium" style={{ color: '#111827' }}>{plan.period}（税込）</span>
         )}
       </p>
-      <ul className="mb-8 space-y-3">
+      <ul className="mb-8 flex-1 space-y-3">
         {plan.features.map((f) => (
           <li key={f} className="flex items-start gap-2.5 text-base font-medium" style={{ color: '#111827' }}>
             <Check size={16} className="mt-0.5 shrink-0 text-[#E8634A]" />
@@ -1052,7 +1052,7 @@ function PricingCard({
       </ul>
       <button
         onClick={() => goTo(14)}
-        className={`block w-full rounded-md py-3 text-center text-base font-medium transition-opacity hover:opacity-90 cursor-pointer ${
+        className={`mt-auto block w-full rounded-md py-3 text-center text-base font-medium transition-opacity hover:opacity-90 cursor-pointer ${
           accent
             ? "bg-[#E8634A] text-white border-none"
             : "bg-white text-[#1A1A1A]"
