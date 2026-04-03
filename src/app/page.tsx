@@ -233,30 +233,28 @@ function AnimatedSection({
    1. Header
    ═══════════════════════════════════════════ */
 
-const SECTION_NAMES = [
-  "ヒーロー",
-  "課題",
-  "カード型",
-  "カルーセル型",
-  "バッジ型",
-  "集め方Before",
-  "集め方After",
-  "管理画面",
-  "見え方Before",
-  "見え方After",
-  "導入",
-  "機能",
-  "料金",
-  "FAQ",
-  "登録",
+const SECTION_NAMES_PC = [
+  "ヒーロー", "課題", "カード型", "カルーセル型", "バッジ型",
+  "集め方Before", "集め方After", "管理画面", "見え方Before", "見え方After",
+  "導入", "機能", "料金", "FAQ", "登録",
+];
+
+const SECTION_NAMES_MOBILE = [
+  "ヒーロー", "課題", "カード型", "カルーセル型", "バッジ型",
+  "集め方Before", "集め方After", "管理画面", "見え方Before", "見え方After",
+  "導入", "機能", "Free", "Pro", "Agency", "FAQ", "登録",
 ];
 
 function Header({
   currentSection,
   goTo,
+  faqIndex,
+  ctaIndex,
 }: {
   currentSection: number;
   goTo: (i: number) => void;
+  faqIndex: number;
+  ctaIndex: number;
 }) {
   return (
     <header
@@ -278,10 +276,10 @@ function Header({
           <button onClick={() => goTo(2)} className="text-sm text-[#374151] hover:text-[#1A1A1A] transition-colors bg-transparent border-none cursor-pointer">デモ</button>
           <button onClick={() => goTo(11)} className="text-sm text-[#374151] hover:text-[#1A1A1A] transition-colors bg-transparent border-none cursor-pointer">機能</button>
           <button onClick={() => goTo(12)} className="text-sm text-[#374151] hover:text-[#1A1A1A] transition-colors bg-transparent border-none cursor-pointer">料金</button>
-          <button onClick={() => goTo(13)} className="text-sm text-[#374151] hover:text-[#1A1A1A] transition-colors bg-transparent border-none cursor-pointer">FAQ</button>
+          <button onClick={() => goTo(faqIndex)} className="text-sm text-[#374151] hover:text-[#1A1A1A] transition-colors bg-transparent border-none cursor-pointer">FAQ</button>
         </div>
         <button
-          onClick={() => goTo(14)}
+          onClick={() => goTo(ctaIndex)}
           className="rounded-md bg-[#E8634A] px-5 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 cursor-pointer border-none"
         >
           無料で始める
@@ -338,7 +336,7 @@ function DashboardMock() {
   );
 }
 
-function Hero({ isActive, goTo }: { isActive: boolean; goTo: (i: number) => void }) {
+function Hero({ isActive, goTo, ctaIndex }: { isActive: boolean; goTo: (i: number) => void; ctaIndex: number }) {
   return (
     <div className="flex h-full items-center px-6">
       <AnimatedSection isActive={isActive} className="mx-auto grid max-w-[1100px] items-center gap-12 md:grid-cols-[1fr_420px] w-full">
@@ -356,7 +354,7 @@ function Hero({ isActive, goTo }: { isActive: boolean; goTo: (i: number) => void
           </p>
           <div className="flex flex-wrap items-center gap-4">
             <button
-              onClick={() => goTo(14)}
+              onClick={() => goTo(ctaIndex)}
               className="inline-flex items-center gap-2 rounded-md bg-[#E8634A] px-7 py-3.5 font-medium text-white transition-opacity hover:opacity-90 cursor-pointer border-none"
             >
               無料で始める
@@ -1019,10 +1017,12 @@ function PricingCard({
   plan,
   goTo,
   accent,
+  ctaIndex,
 }: {
   plan: typeof plans[number];
   goTo: (i: number) => void;
   accent?: boolean;
+  ctaIndex: number;
 }) {
   return (
     <div className={`relative mx-auto flex h-full w-full max-w-[400px] flex-col rounded-xl border ${accent ? "border-[#E8634A]" : "border-gray-200"} bg-white p-8 md:p-10`}>
@@ -1051,7 +1051,7 @@ function PricingCard({
         ))}
       </ul>
       <button
-        onClick={() => goTo(14)}
+        onClick={() => goTo(ctaIndex)}
         className={`mt-auto block w-full rounded-md py-3 text-center text-base font-medium transition-opacity hover:opacity-90 cursor-pointer ${
           accent
             ? "bg-[#E8634A] text-white border-none"
@@ -1065,7 +1065,7 @@ function PricingCard({
   );
 }
 
-function Pricing({ isActive, goTo }: { isActive: boolean; goTo: (i: number) => void }) {
+function Pricing({ isActive, goTo, ctaIndex }: { isActive: boolean; goTo: (i: number) => void; ctaIndex: number }) {
   return (
     <div className="flex h-full items-center bg-[#F5F3EF] px-4 md:px-6 overflow-y-auto">
       <AnimatedSection isActive={isActive} className="mx-auto max-w-[1100px] w-full py-20 md:py-0">
@@ -1077,10 +1077,39 @@ function Pricing({ isActive, goTo }: { isActive: boolean; goTo: (i: number) => v
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-          <PricingCard plan={plans[0]} goTo={goTo} />
-          <PricingCard plan={plans[1]} goTo={goTo} accent />
-          <PricingCard plan={plans[2]} goTo={goTo} />
+          <PricingCard plan={plans[0]} goTo={goTo} ctaIndex={ctaIndex} />
+          <PricingCard plan={plans[1]} goTo={goTo} accent ctaIndex={ctaIndex} />
+          <PricingCard plan={plans[2]} goTo={goTo} ctaIndex={ctaIndex} />
         </div>
+      </AnimatedSection>
+    </div>
+  );
+}
+
+function PricingSingle({
+  plan,
+  isActive,
+  goTo,
+  ctaIndex,
+  accent,
+  step,
+}: {
+  plan: typeof plans[number];
+  isActive: boolean;
+  goTo: (i: number) => void;
+  ctaIndex: number;
+  accent?: boolean;
+  step: string;
+}) {
+  return (
+    <div className="flex h-full items-center bg-[#F5F3EF] px-4">
+      <AnimatedSection isActive={isActive} className="mx-auto max-w-[400px] w-full">
+        <div className="text-center mb-6">
+          <SectionLabel>料金プラン</SectionLabel>
+          <h2 className="mb-2 text-2xl font-bold">{plan.name}プラン</h2>
+          <p className="text-xs text-[#374151]">{step}</p>
+        </div>
+        <PricingCard plan={plan} goTo={goTo} ctaIndex={ctaIndex} accent={accent} />
       </AnimatedSection>
     </div>
   );
@@ -1253,10 +1282,12 @@ function NavDots({
   total,
   current,
   goTo,
+  sectionNames,
 }: {
   total: number;
   current: number;
   goTo: (i: number) => void;
+  sectionNames: string[];
 }) {
   return (
     <nav className="nav-dots" aria-label="セクションナビゲーション">
@@ -1265,7 +1296,7 @@ function NavDots({
           key={i}
           className={`nav-dot ${i === current ? "active" : ""}`}
           onClick={() => goTo(i)}
-          aria-label={SECTION_NAMES[i] || `セクション ${i + 1}`}
+          aria-label={sectionNames[i] || `セクション ${i + 1}`}
         />
       ))}
     </nav>
@@ -1276,23 +1307,47 @@ function NavDots({
    Page — FullPage Controller
    ═══════════════════════════════════════════ */
 
-const TOTAL_SECTIONS = 15;
 const DEBOUNCE_MS = 900;
+
+function useIsMd() {
+  const [isMd, setIsMd] = useState(true); // SSR default: PC
+  useEffect(() => {
+    const mql = window.matchMedia("(min-width: 768px)");
+    setIsMd(mql.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMd(e.matches);
+    mql.addEventListener("change", handler);
+    return () => mql.removeEventListener("change", handler);
+  }, []);
+  return isMd;
+}
 
 export default function Home() {
   const [currentSection, setCurrentSection] = useState(0);
   const isTransitioning = useRef(false);
   const touchStartY = useRef(0);
+  const isMd = useIsMd();
+
+  const totalSections = isMd ? 15 : 17;
+  const sectionNames = isMd ? SECTION_NAMES_PC : SECTION_NAMES_MOBILE;
+  const faqIndex = isMd ? 13 : 15;
+  const ctaIndex = isMd ? 14 : 16;
+
+  // Clamp current section when viewport changes total
+  useEffect(() => {
+    if (currentSection >= totalSections) {
+      setCurrentSection(totalSections - 1);
+    }
+  }, [totalSections, currentSection]);
 
   const goTo = useCallback((index: number) => {
-    if (index < 0 || index >= TOTAL_SECTIONS || index === currentSection) return;
+    if (index < 0 || index >= totalSections || index === currentSection) return;
     if (isTransitioning.current) return;
     isTransitioning.current = true;
     setCurrentSection(index);
     setTimeout(() => {
       isTransitioning.current = false;
     }, DEBOUNCE_MS);
-  }, [currentSection]);
+  }, [currentSection, totalSections]);
 
   const goNext = useCallback(() => goTo(currentSection + 1), [currentSection, goTo]);
   const goPrev = useCallback(() => goTo(currentSection - 1), [currentSection, goTo]);
@@ -1367,11 +1422,11 @@ export default function Home() {
 
   return (
     <>
-      <Header currentSection={currentSection} goTo={goTo} />
-      <NavDots total={TOTAL_SECTIONS} current={currentSection} goTo={goTo} />
+      <Header currentSection={currentSection} goTo={goTo} faqIndex={faqIndex} ctaIndex={ctaIndex} />
+      <NavDots total={totalSections} current={currentSection} goTo={goTo} sectionNames={sectionNames} />
       <div className="fullpage-container">
         <FullPageSection index={0} currentSection={currentSection}>
-          <Hero isActive={currentSection === 0} goTo={goTo} />
+          <Hero isActive={currentSection === 0} goTo={goTo} ctaIndex={ctaIndex} />
         </FullPageSection>
         <FullPageSection index={1} currentSection={currentSection}>
           <PainPoints isActive={currentSection === 1} />
@@ -1406,14 +1461,30 @@ export default function Home() {
         <FullPageSection index={11} currentSection={currentSection}>
           <Features isActive={currentSection === 11} />
         </FullPageSection>
-        <FullPageSection index={12} currentSection={currentSection}>
-          <Pricing isActive={currentSection === 12} goTo={goTo} />
+
+        {isMd ? (
+          <FullPageSection index={12} currentSection={currentSection}>
+            <Pricing isActive={currentSection === 12} goTo={goTo} ctaIndex={ctaIndex} />
+          </FullPageSection>
+        ) : (
+          <>
+            <FullPageSection index={12} currentSection={currentSection}>
+              <PricingSingle plan={plans[0]} isActive={currentSection === 12} goTo={goTo} ctaIndex={ctaIndex} step="1/3" />
+            </FullPageSection>
+            <FullPageSection index={13} currentSection={currentSection}>
+              <PricingSingle plan={plans[1]} isActive={currentSection === 13} goTo={goTo} ctaIndex={ctaIndex} accent step="2/3" />
+            </FullPageSection>
+            <FullPageSection index={14} currentSection={currentSection}>
+              <PricingSingle plan={plans[2]} isActive={currentSection === 14} goTo={goTo} ctaIndex={ctaIndex} step="3/3" />
+            </FullPageSection>
+          </>
+        )}
+
+        <FullPageSection index={faqIndex} currentSection={currentSection}>
+          <FAQ isActive={currentSection === faqIndex} />
         </FullPageSection>
-        <FullPageSection index={13} currentSection={currentSection}>
-          <FAQ isActive={currentSection === 13} />
-        </FullPageSection>
-        <FullPageSection index={14} currentSection={currentSection}>
-          <WaitlistSection isActive={currentSection === 14} />
+        <FullPageSection index={ctaIndex} currentSection={currentSection}>
+          <WaitlistSection isActive={currentSection === ctaIndex} />
         </FullPageSection>
       </div>
     </>
