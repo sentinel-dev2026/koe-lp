@@ -275,13 +275,15 @@ function AnimatedSection({
   className?: string;
   children: React.ReactNode;
 }) {
-  const hasBeenActive = useRef(false);
-  if (isActive) hasBeenActive.current = true;
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    if (isActive && !visible) setVisible(true);
+  }, [isActive, visible]);
   return (
     <motion.div
       className={className}
       initial="hidden"
-      animate={hasBeenActive.current ? "visible" : "hidden"}
+      animate={visible ? "visible" : "hidden"}
       variants={variants}
     >
       {children}
