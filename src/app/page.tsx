@@ -246,9 +246,7 @@ const SECTION_NAMES = [
   "見え方After",
   "導入",
   "機能",
-  "Free",
-  "Pro",
-  "Agency",
+  "料金",
   "FAQ",
   "登録",
 ];
@@ -280,10 +278,10 @@ function Header({
           <button onClick={() => goTo(2)} className="text-sm text-[#374151] hover:text-[#1A1A1A] transition-colors bg-transparent border-none cursor-pointer">デモ</button>
           <button onClick={() => goTo(11)} className="text-sm text-[#374151] hover:text-[#1A1A1A] transition-colors bg-transparent border-none cursor-pointer">機能</button>
           <button onClick={() => goTo(12)} className="text-sm text-[#374151] hover:text-[#1A1A1A] transition-colors bg-transparent border-none cursor-pointer">料金</button>
-          <button onClick={() => goTo(15)} className="text-sm text-[#374151] hover:text-[#1A1A1A] transition-colors bg-transparent border-none cursor-pointer">FAQ</button>
+          <button onClick={() => goTo(13)} className="text-sm text-[#374151] hover:text-[#1A1A1A] transition-colors bg-transparent border-none cursor-pointer">FAQ</button>
         </div>
         <button
-          onClick={() => goTo(16)}
+          onClick={() => goTo(14)}
           className="rounded-md bg-[#E8634A] px-5 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 cursor-pointer border-none"
         >
           無料で始める
@@ -358,7 +356,7 @@ function Hero({ isActive, goTo }: { isActive: boolean; goTo: (i: number) => void
           </p>
           <div className="flex flex-wrap items-center gap-4">
             <button
-              onClick={() => goTo(16)}
+              onClick={() => goTo(14)}
               className="inline-flex items-center gap-2 rounded-md bg-[#E8634A] px-7 py-3.5 font-medium text-white transition-opacity hover:opacity-90 cursor-pointer border-none"
             >
               無料で始める
@@ -1053,7 +1051,7 @@ function PricingCard({
         ))}
       </ul>
       <button
-        onClick={() => goTo(16)}
+        onClick={() => goTo(14)}
         className={`block w-full rounded-md py-3 text-center text-base font-medium transition-opacity hover:opacity-90 cursor-pointer ${
           accent
             ? "bg-[#E8634A] text-white border-none"
@@ -1067,73 +1065,20 @@ function PricingCard({
   );
 }
 
-function PricingFree({ isActive, goTo }: { isActive: boolean; goTo: (i: number) => void }) {
+function Pricing({ isActive, goTo }: { isActive: boolean; goTo: (i: number) => void }) {
   return (
-    <div className="flex h-full items-center bg-[#F5F3EF] px-4 md:px-6">
-      <AnimatedSection isActive={isActive} className="mx-auto max-w-[1100px] w-full">
-        <div>
-          <div className="flex items-center justify-between">
-            <SectionLabel>料金プラン</SectionLabel>
-            <span className="text-xs text-[#374151]">1/3</span>
-          </div>
-          <h2 className="mb-2 md:mb-3 text-2xl font-bold md:text-4xl">Free</h2>
-          <p className="mb-6 md:mb-10 max-w-md text-xs md:text-base leading-relaxed text-[#374151]">
-            まずは無料で試す
+    <div className="flex h-full items-center bg-[#F5F3EF] px-4 md:px-6 overflow-y-auto">
+      <AnimatedSection isActive={isActive} className="mx-auto max-w-[1100px] w-full py-20 md:py-0">
+        <div className="text-center mb-8 md:mb-12">
+          <SectionLabel>料金プラン</SectionLabel>
+          <h2 className="mb-2 md:mb-3 text-2xl font-bold md:text-4xl">料金プラン</h2>
+          <p className="max-w-md mx-auto text-xs md:text-base leading-relaxed text-[#374151]">
+            あなたに合ったプランを選べます
           </p>
         </div>
-        <div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
           <PricingCard plan={plans[0]} goTo={goTo} />
-        </div>
-      </AnimatedSection>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════
-   12. Pricing — Pro
-   ═══════════════════════════════════════════ */
-
-function PricingPro({ isActive, goTo }: { isActive: boolean; goTo: (i: number) => void }) {
-  return (
-    <div className="flex h-full items-center px-4 md:px-6">
-      <AnimatedSection isActive={isActive} className="mx-auto max-w-[1100px] w-full">
-        <div>
-          <div className="flex items-center justify-between">
-            <SectionLabel>料金プラン</SectionLabel>
-            <span className="text-xs text-[#374151]">2/3</span>
-          </div>
-          <h2 className="mb-2 md:mb-3 text-2xl font-bold md:text-4xl">Pro — おすすめ</h2>
-          <p className="mb-6 md:mb-10 max-w-md text-xs md:text-base leading-relaxed text-[#374151]">
-            本格運用に
-          </p>
-        </div>
-        <div>
           <PricingCard plan={plans[1]} goTo={goTo} accent />
-        </div>
-      </AnimatedSection>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════
-   13. Pricing — Agency
-   ═══════════════════════════════════════════ */
-
-function PricingAgency({ isActive, goTo }: { isActive: boolean; goTo: (i: number) => void }) {
-  return (
-    <div className="flex h-full items-center bg-[#F5F3EF] px-4 md:px-6">
-      <AnimatedSection isActive={isActive} className="mx-auto max-w-[1100px] w-full">
-        <div>
-          <div className="flex items-center justify-between">
-            <SectionLabel>料金プラン</SectionLabel>
-            <span className="text-xs text-[#374151]">3/3</span>
-          </div>
-          <h2 className="mb-2 md:mb-3 text-2xl font-bold md:text-4xl">Agency</h2>
-          <p className="mb-6 md:mb-10 max-w-md text-xs md:text-base leading-relaxed text-[#374151]">
-            複数クライアントを管理
-          </p>
-        </div>
-        <div>
           <PricingCard plan={plans[2]} goTo={goTo} />
         </div>
       </AnimatedSection>
@@ -1331,7 +1276,7 @@ function NavDots({
    Page — FullPage Controller
    ═══════════════════════════════════════════ */
 
-const TOTAL_SECTIONS = 17;
+const TOTAL_SECTIONS = 15;
 const DEBOUNCE_MS = 900;
 
 export default function Home() {
@@ -1462,19 +1407,13 @@ export default function Home() {
           <Features isActive={currentSection === 11} />
         </FullPageSection>
         <FullPageSection index={12} currentSection={currentSection}>
-          <PricingFree isActive={currentSection === 12} goTo={goTo} />
+          <Pricing isActive={currentSection === 12} goTo={goTo} />
         </FullPageSection>
         <FullPageSection index={13} currentSection={currentSection}>
-          <PricingPro isActive={currentSection === 13} goTo={goTo} />
+          <FAQ isActive={currentSection === 13} />
         </FullPageSection>
         <FullPageSection index={14} currentSection={currentSection}>
-          <PricingAgency isActive={currentSection === 14} goTo={goTo} />
-        </FullPageSection>
-        <FullPageSection index={15} currentSection={currentSection}>
-          <FAQ isActive={currentSection === 15} />
-        </FullPageSection>
-        <FullPageSection index={16} currentSection={currentSection}>
-          <WaitlistSection isActive={currentSection === 16} />
+          <WaitlistSection isActive={currentSection === 14} />
         </FullPageSection>
       </div>
     </>
