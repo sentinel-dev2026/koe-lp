@@ -29,18 +29,18 @@ import {
    ═══════════════════════════════════════════ */
 
 const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  hidden: { y: 30 },
+  visible: { y: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
 
 const fadeLeft: Variants = {
-  hidden: { opacity: 0, x: -30 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  hidden: { x: -30 },
+  visible: { x: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
 
 const fadeRight: Variants = {
-  hidden: { opacity: 0, x: 30 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  hidden: { x: 30 },
+  visible: { x: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
 
 const staggerContainer = (stagger = 0.15): Variants => ({
@@ -49,23 +49,21 @@ const staggerContainer = (stagger = 0.15): Variants => ({
 });
 
 const scaleUp: Variants = {
-  hidden: { opacity: 0, scale: 0.95 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 0.6, ease: "easeOut" } },
+  hidden: { scale: 0.95 },
+  visible: { scale: 1, transition: { duration: 0.6, ease: "easeOut" } },
 };
 
 const popIn: Variants = {
-  hidden: { opacity: 0, scale: 0.9 },
+  hidden: { scale: 0.9 },
   visible: {
-    opacity: 1,
     scale: 1,
     transition: { duration: 0.5, ease: [0.175, 0.885, 0.32, 1.275] },
   },
 };
 
 const bounceFade: Variants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { y: 20 },
   visible: {
-    opacity: 1,
     y: 0,
     transition: { duration: 0.6, ease: [0.175, 0.885, 0.32, 1.1] },
   },
