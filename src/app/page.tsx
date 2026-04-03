@@ -53,10 +53,10 @@ const testimonials = [
   },
   {
     name: "鈴木一郎",
-    role: "Web制作会社",
+    role: "整体院オーナー",
     rating: 5,
     comment:
-      "技術力が高く、イメージ通りに仕上げてくれます。クライアント案件で重宝しています。",
+      "施術後にQRコードを渡すだけで声が集まります。サイトの信頼感が格段に上がりました。",
     initial: "鈴",
     image: "https://images.unsplash.com/photo-1617196701537-7329482cc9fe?w=100&h=100&fit=crop&crop=face",
   },
@@ -66,7 +66,7 @@ const features = [
   {
     icon: FileText,
     title: "収集フォーム",
-    desc: "URLを共有するだけ。お客様がフォームから声を投稿できます。",
+    desc: "URLやQRコードを共有するだけ。お客様がスマホから簡単に声を投稿できます。",
   },
   {
     icon: CheckCircle,
@@ -100,7 +100,7 @@ const plans = [
     name: "Free",
     price: "¥0",
     period: "",
-    features: ["プロジェクト1件", "お客様の声10件", "基本ウィジェット"],
+    features: ["プロジェクト1件", "お客様の声10件", "基本ウィジェット", "Powered by KoeLog バッジ表示"],
     recommended: false,
   },
   {
@@ -133,7 +133,7 @@ const plans = [
 const faqData = [
   {
     q: "無料プランに期限はありますか？",
-    a: "いいえ、無料プランは期間無制限でお使いいただけます。",
+    a: "いいえ、無料プランは期間無制限でお使いいただけます。無料プランではウィジェットに「Powered by KoeLog」バッジが表示されます。",
   },
   {
     q: "クレジットカードは必要ですか？",
@@ -141,15 +141,15 @@ const faqData = [
   },
   {
     q: "どんなサイトにも埋め込めますか？",
-    a: "はい。スクリプトタグ1行を貼り付けるだけで、WordPress・Shopify・静的サイトなどあらゆるサイトに対応します。",
+    a: "はい。スクリプトタグ1行を貼り付けるだけで、WordPress・Shopify・Wix・ペライチ・静的サイトなどあらゆるサイトに対応します。",
   },
   {
-    q: "デザインはカスタマイズできますか？",
-    a: "Pro以上のプランでカラー・レイアウト・フォントなどを自由にカスタマイズ可能です。",
+    q: "QRコードでお客様の声を集められますか？",
+    a: "はい。フォームURLからQRコードを生成し、名刺・レシート・店頭POPなどに印刷すれば、お客様がスマホで簡単に回答できます。",
   },
   {
-    q: "データのエクスポートは可能ですか？",
-    a: "はい。CSV形式でいつでもエクスポートできます。",
+    q: "パソコンが苦手でも使えますか？",
+    a: "はい。アカウント登録後、フォームURLの共有と承認ボタンを押すだけ。専門知識は不要です。",
   },
   {
     q: "解約はいつでもできますか？",
@@ -348,7 +348,7 @@ function Hero({ isActive, goTo, ctaIndex }: { isActive: boolean; goTo: (i: numbe
             もっと簡単に。
           </h1>
           <p className="mb-8 max-w-md text-lg leading-relaxed text-[#374151]">
-            収集・承認・サイト表示まで、わずか2分。
+            フォームやQRコードで収集、ワンクリック承認、あなたのサイトに自動表示。
             <br />
             手作業を減らして、信頼を増やす。
           </p>
@@ -628,7 +628,7 @@ function WidgetDemoBadge({ isActive }: { isActive: boolean }) {
 
 const collectStepsBefore = [
   "Googleフォームを作成",
-  "顧客にURLを送る",
+  "お客様にURLを送る",
   "回答をExcelにコピー",
   "良い声だけ選別",
   "テキストを整形",
@@ -681,7 +681,7 @@ function BeforeCollect({ isActive }: { isActive: boolean }) {
    ═══════════════════════════════════════════ */
 
 const collectStepsAfter = [
-  "フォームURLを顧客に送る",
+  "フォームURLやQRコードをお客様に共有",
   "ダッシュボードで「承認」をクリック",
   "サイトに自動表示",
 ];
@@ -926,8 +926,8 @@ function Steps({ isActive }: { isActive: boolean }) {
   const steps = [
     {
       num: "1",
-      title: "フォームURLを共有",
-      desc: "自動生成されるフォームURLをお客様にシェアするだけ。",
+      title: "フォームURLやQRコードを共有",
+      desc: "自動生成されるフォームURLをお客様にシェア。QRコードなら名刺やレシートに印刷するだけ。",
       icon: FileText,
     },
     {
